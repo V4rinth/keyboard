@@ -1,0 +1,41 @@
+Program Kullanım Bilgilendirmesi
+
+Programı çalıştırmak için HTML dosyasını açmanız yeterlidir.
+
+Metinleri Değiştirme
+
+Metinlerde değişiklik yapmak istiyorsanız:
+
+metinler.js dosyasını Not Defteri (veya herhangi bir metin düzenleyici) ile açın.
+Metinleri, ilgili bölümde bulunan '...' tırnaklarının içine yazın veya mevcut metinleri değiştirin.
+Metinler zorluk seviyelerine göre ayrılmıştır. Düzenleme yaparken doğru bölüme ekleme yaptığınızdan emin olun.
+Ses Dosyalarını Değiştirme
+
+Sesli metin özelliğini kullanmak için:
+
+V4rinth Ses Metinleri klasörüne MP3 formatındaki ses dosyalarını ekleyin.
+En fazla 7 adet MP3 dosyası kullanabilirsiniz.
+Dosya isimlerini aşağıdaki şekilde sıralı olarak vermeniz gerekmektedir:
+metin1.mp3
+metin2.mp3
+metin3.mp3
+metin4.mp3
+metin5.mp3
+metin6.mp3
+metin7.mp3
+Önemli: Ses Metni Düzenleme
+
+Ses dosyalarını ekledikten sonra sesMetinleri.js dosyasını açın ve her ses dosyasında okunan metni ilgili alana yerleştirin.
+
+Metinleri eklerken şu kurallara dikkat edin:
+
+Noktalama işaretleri kullanmayın.
+Sadece cümlenin ilk harfi büyük olsun.
+Diğer tüm harfler normal şekilde yazılmalıdır.
+Metin, ses kaydında okunan içerikle birebir aynı olmalıdır.
+Doğru Örnek
+Bugün hava oldukça güzel ve dışarıda yürüyüş yapmak istiyorum
+Yanlış Örnek
+Bugün hava oldukça güzel, ve dışarıda yürüyüş yapmak istiyorum.
+
+Bu kurallara uyulmazsa program; doğru yazılan karakterleri, yanlışları, doğruluk oranını ve diğer istatistikleri doğru şekilde hesaplayamayabilir.

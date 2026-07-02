@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MrVarinth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="V4rinth paragraf metinleri/metinler.js"></script>
+    <script src="V4rinth paragraf metinleri/harfMetinleri.js"></script>
+    <script src="V4rinth paragraf metinleri/seviyeYonetimi.js"></script>
+    <script src="V4rinth ses metinleri/sesMetinleri.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg:#0d0d0f;--bg2:#111114;--bg3:#161619;
+            --surface:rgba(255,255,255,0.04);--surface-hover:rgba(255,255,255,0.08);
+            --border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.22);
+            --border-accent:rgba(6,182,212,0.5);
+            --text:#f0f0f2;--text2:#a0a0b0;--text3:#606070;
+            --accent:#06b6d4;--accent2:#22d3ee;
+            --accent-glow:rgba(6,182,212,0.2);--accent-dim:rgba(6,182,212,0.08);
+            --correct:#ffffff;--correct-shadow:0 0 10px rgba(255,255,255,0.65),0 0 20px rgba(255,255,255,0.3);
+            --wrong:#f87171;--wrong-shadow:0 0 10px rgba(248,113,113,0.5);
+            --cursor:#22d3ee;
+            --modal-bg:rgba(17,17,20,0.97);
+            --shadow:0 25px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.05);
+            --glow:0 0 40px rgba(6,182,212,0.15);
+            --warm:#f59e0b;--warm-dim:rgba(245,158,11,0.08);--warm-border:rgba(245,158,11,0.4);--warm-glow:rgba(245,158,11,0.2);
+            --audio:#ef4444;--audio-dim:rgba(239,68,68,0.08);--audio-border:rgba(239,68,68,0.4);--audio-glow:rgba(239,68,68,0.2);
+            --bas:#34d399;--bas-dim:rgba(52,211,153,0.08);--bas-border:rgba(52,211,153,0.4);--bas-glow:rgba(52,211,153,0.2);
+            --panel-w:320px;
+        }
+        body.theme-light {
+            --bg:#f5f5f7;--bg2:#ebebef;--bg3:#e2e2e8;
+            --surface:rgba(0,0,0,0.04);--surface-hover:rgba(0,0,0,0.08);
+            --border:rgba(0,0,0,0.08);--border-strong:rgba(0,0,0,0.22);
+            --border-accent:rgba(8,145,178,0.4);
+            --text:#111118;--text2:#50505a;--text3:#9090a0;
+            --accent:#0891b2;--accent2:#0e7490;
+            --accent-glow:rgba(8,145,178,0.15);--accent-dim:rgba(8,145,178,0.06);
+            --correct:#0f172a;--correct-shadow:none;
+            --wrong:#dc2626;--wrong-shadow:0 0 8px rgba(220,38,38,0.4);
+            --cursor:#0891b2;--modal-bg:rgba(245,245,247,0.98);
+            --shadow:0 25px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.06);
+            --glow:0 0 40px rgba(8,145,178,0.08);
+            --warm:#d97706;--warm-dim:rgba(217,119,6,0.08);--warm-border:rgba(217,119,6,0.4);--warm-glow:rgba(217,119,6,0.15);
+            --audio:#dc2626;--audio-dim:rgba(220,38,68,0.08);--audio-border:rgba(220,38,68,0.4);--audio-glow:rgba(220,38,68,0.15);
+            --bas:#059669;--bas-dim:rgba(5,150,105,0.06);--bas-border:rgba(5,150,105,0.35);--bas-glow:rgba(5,150,105,0.15);
+        }
+        body{font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+        body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+        body::after{content:"";position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,var(--accent-glow) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+        #theme-toggle{position:fixed;bottom:24px;left:24px;z-index:9999;width:46px;height:46px;border-radius:50%;border:1px solid var(--border-strong);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.3s;box-shadow:0 4px 20px rgba(0,0,0,0.3);padding:0;}
+        #theme-toggle:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 4px 20px var(--accent-glow);transform:scale(1.08);}
+
+        /* ── Side panel ── */
+        .side-panel{position:fixed;top:0;height:100vh;width:var(--panel-w);background:var(--bg2);z-index:3000;display:flex;flex-direction:column;transition:transform 0.4s cubic-bezier(0.1,0.9,0.2,1);}
+        #right-panel{right:0;border-left:1px solid var(--border-strong);transform:translateX(100%);box-shadow:-10px 0 40px rgba(0,0,0,0.35);}
+        #right-panel.open{transform:translateX(0);}
+        .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        .panel-header h3{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+        .panel-close{background:none;border:none;color:var(--text3);font-size:17px;cursor:pointer;padding:4px 8px;border-radius:6px;}
+        .panel-close:hover{color:var(--text);background:var(--surface-hover);}
+        .panel-body{flex:1;overflow-y:auto;padding:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+        .panel-body::-webkit-scrollbar{width:4px;}
+        .panel-body::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px;}
+        /* ── Tab bar ── */
+        .tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+        .tab-btn{flex:1;padding:13px 8px;font-size:13px;font-weight:700;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all 0.25s;font-family:'Inter',sans-serif;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:6px;}
+        .tab-btn:hover{color:var(--text2);background:var(--surface);}
+        .tab-btn.active-tab{color:var(--bas);border-bottom-color:var(--bas);background:var(--bas-dim);}
+        .tab-btn.active-tab.ileri{color:var(--accent2);border-bottom-color:var(--accent2);background:var(--accent-dim);}
+        .tab-pane{display:none;padding:16px;}
+        .tab-pane.active{display:block;}
+        /* ── Başlangıç items ── */
+        .bas-intro{background:var(--bas-dim);border:1px solid var(--bas-border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--bas);line-height:1.6;}
+        .bas-intro strong{display:block;margin-bottom:3px;font-size:12px;}
+        .bas-item{width:100%;text-align:left;padding:11px 14px;font-size:13px;font-weight:600;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.22s;font-family:'Inter',sans-serif;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+        .bas-item:hover{background:var(--bas-dim);border-color:var(--bas-border);color:var(--bas);}
+        .bas-item.active{background:var(--bas-dim);border-color:var(--bas-border);color:var(--bas);font-weight:700;}
+        .bas-keys{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;margin-left:auto;padding:2px 8px;border-radius:6px;background:var(--surface-hover);border:1px solid var(--border-strong);color:var(--text3);white-space:nowrap;flex-shrink:0;}
+        .bas-item.active .bas-keys{background:rgba(52,211,153,0.15);border-color:var(--bas-border);color:var(--bas);}
+        .bas-icon{font-size:18px;flex-shrink:0;}
+        /* ── Diff items ── */
+        .diff-section-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin:14px 0 6px;padding-left:4px;}
+        .diff-section-title:first-child{margin-top:2px;}
+        .diff-item{width:100%;text-align:left;padding:11px 14px;font-size:13px;font-weight:500;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.22s;font-family:'Inter',sans-serif;margin-bottom:5px;display:flex;align-items:center;gap:10px;}
+        .diff-item:hover{background:var(--surface-hover);color:var(--text);border-color:var(--border-strong);}
+        .diff-item.active{background:var(--accent-dim);border-color:var(--border-accent);color:var(--accent2);font-weight:700;}
+        .diff-item.warmup{border-color:var(--warm-border);background:var(--warm-dim);color:var(--warm);}
+        .diff-item.warmup.active{font-weight:700;}
+        .diff-item.audio{border-color:var(--audio-border);background:var(--audio-dim);color:var(--audio);}
+        .diff-item.audio.active{font-weight:700;}
+        .diff-item.letter{border-color:var(--bas-border);background:var(--bas-dim);color:var(--bas);}
+        .diff-item.letter.active{font-weight:700;}
+        .diff-item.pro{border-color:#a78bfa66;background:rgba(167,139,250,0.08);color:#a78bfa;}
+        .diff-item.pro.active{font-weight:700;}
+        .diff-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:auto;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0;}
+        .badge-easy{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+        .badge-mid{background:rgba(250,204,21,0.12);color:#facc15;border:1px solid rgba(250,204,21,0.3);}
+        .badge-hard{background:rgba(251,146,60,0.12);color:#fb923c;border:1px solid rgba(251,146,60,0.3);}
+        .badge-ultra{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.3);}
+        .badge-warm{background:var(--warm-dim);color:var(--warm);border:1px solid var(--warm-border);}
+        .badge-audio{background:var(--audio-dim);color:var(--audio);border:1px solid var(--audio-border);}
+        .badge-letter{background:var(--bas-dim);color:var(--bas);border:1px solid var(--bas-border);}
+        .badge-pro{background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.4);}
+        /* ── Level / Lock / Rozet ── */
+        .diff-item.locked{opacity:0.5;cursor:not-allowed;filter:grayscale(0.4);}
+        .diff-item.locked:hover{background:var(--surface);border-color:var(--border);color:var(--text2);}
+        .lock-req{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:auto;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0;background:rgba(255,255,255,0.06);color:var(--text3);border:1px solid var(--border-strong);display:flex;align-items:center;gap:3px;}
+        .lvl-pill{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent-dim),rgba(255,255,255,0.02));border:1px solid var(--border-accent);border-radius:12px;padding:10px 14px;margin-bottom:14px;cursor:pointer;transition:all .25s;}
+        .lvl-pill:hover{border-color:var(--accent);box-shadow:0 0 18px var(--accent-glow);}
+        .lvl-badge-circle{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;box-shadow:0 0 12px var(--accent-glow);}
+        .lvl-info{flex:1;min-width:0;}
+        .lvl-info .lvl-name{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;}
+        .lvl-info .lvl-xp-text{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+        .lvl-bar-track{width:100%;height:6px;border-radius:4px;background:var(--bg3);margin-top:6px;overflow:hidden;}
+        .lvl-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s ease;}
+        .lvl-rozet-count{font-size:10px;color:var(--accent2);font-weight:700;white-space:nowrap;}
+        .lvl-rank-text{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-top:1px;}
+        .locked-info{font-size:10px;color:var(--text3);text-align:center;padding:8px 6px;margin-top:2px;margin-bottom:8px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:8px;line-height:1.5;}
+        /* Rozetler tab */
+        .rozet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        .rozet-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;transition:all .2s;}
+        .rozet-card.unlocked{border-color:var(--border-accent);background:var(--accent-dim);}
+        .rozet-card .rz-icon{font-size:26px;margin-bottom:6px;filter:grayscale(1);opacity:0.35;}
+        .rozet-card.unlocked .rz-icon{filter:none;opacity:1;}
+        .rozet-card .rz-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px;}
+        .rozet-card.unlocked .rz-title{color:var(--accent2);}
+        .rozet-card .rz-desc{font-size:9px;color:var(--text3);line-height:1.4;}
+        .rozet-summary{font-size:11px;color:var(--text3);text-align:center;margin-bottom:14px;font-weight:600;}
+        .rozet-summary span{color:var(--accent2);font-weight:800;}
+        /* Toast */
+        #toast-stack{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:5000;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;}
+        .toast{display:flex;align-items:center;gap:12px;background:var(--modal-bg);border:1px solid var(--border-accent);border-radius:14px;padding:12px 20px;box-shadow:var(--shadow);min-width:260px;animation:toastIn .4s cubic-bezier(.34,1.56,.64,1);}
+        .toast.toast-out{animation:toastOut .35s ease forwards;}
+        @keyframes toastIn{from{opacity:0;transform:translateY(-18px) scale(.94);}to{opacity:1;transform:translateY(0) scale(1);}}
+        @keyframes toastOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(-14px) scale(.96);}}
+        .toast .toast-icon{font-size:26px;flex-shrink:0;}
+        .toast .toast-title{font-size:12px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:0.5px;}
+        .toast .toast-sub{font-size:12px;color:var(--text);font-weight:600;margin-top:1px;}
+        .toast.toast-level{border-color:var(--warm-border);}
+        .toast.toast-level .toast-title{color:var(--warm);}
+        /* ── Time section inside panel ── */
+        .time-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;}
+        .time-section .ts-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:block;}
+        .time-row{display:flex;align-items:center;gap:10px;}
+        .time-row input{width:70px;padding:7px 10px;font-size:14px;font-family:'JetBrains Mono',monospace;background:var(--bg3);border:1px solid var(--border-strong);color:var(--text);border-radius:8px;text-align:center;outline:none;}
+        .time-row input:focus{border-color:var(--accent);}
+        .time-row button{flex:1;padding:7px 0 !important;font-size:13px !important;background:var(--accent-dim);border-color:var(--border-accent);color:var(--accent2);}
+        .time-current{font-size:11px;color:var(--text3);margin-top:8px;}
+        /* ── Main menu ── */
+        #main-menu{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--border);padding:36px 32px;border-radius:20px;box-shadow:var(--shadow);width:92%;max-width:460px;z-index:2000;}
+        .menu-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;}
+        .menu-logo-icon{width:40px;height:40px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+        #main-menu h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+        .menu-tagline{text-align:center;color:var(--text3);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;font-weight:500;}
+        .menu-sel-row{display:flex;gap:8px;margin-bottom:18px;}
+        .sel-pill{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 10px;text-align:center;cursor:pointer;transition:all 0.22s;}
+        .sel-pill:hover{border-color:var(--border-accent);background:var(--accent-dim);}
+        .sel-pill .sp-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:3px;}
+        .sel-pill .sp-val{font-size:13px;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sel-pill .sp-hint{font-size:9px;color:var(--text3);margin-top:2px;}
+        .btn-start{width:100%;padding:14px;font-size:17px;font-weight:700;letter-spacing:1px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px var(--accent-glow);font-family:'Inter',sans-serif;margin-bottom:12px;position:relative;overflow:hidden;}
+        .btn-start::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity 0.3s;}
+        .btn-start:hover::before{opacity:1;}
+        .btn-start:hover{transform:translateY(-1px);box-shadow:0 8px 30px var(--accent-glow);}
+        .btn-start:active{transform:translateY(0);}
+        .menu-row{display:flex;gap:8px;margin-bottom:8px;}
+        button{padding:10px 18px;font-size:14px;font-weight:500;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.25s;font-family:'Inter',sans-serif;}
+        button:hover{background:var(--surface-hover);border-color:var(--border-strong);color:var(--text);}
+        .btn-outline-acc{border-color:var(--border-accent);color:var(--accent2);background:var(--accent-dim);}
+        .btn-outline-acc:hover{background:rgba(6,182,212,0.15);border-color:var(--accent);color:var(--accent2);}
+        .menu-row button{flex:1;}
+        #time-panel{display:none;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;}
+        #time-panel label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;}
+        #time-input{width:80px;padding:8px 12px;font-size:15px;font-family:'JetBrains Mono',monospace;background:var(--bg3);border:1px solid var(--border-strong);color:var(--text);border-radius:8px;text-align:center;outline:none;}
+        #time-input:focus{border-color:var(--accent);}
+        .motto{text-align:center;font-size:11px;color:var(--text3);margin-top:18px;font-style:italic;line-height:1.5;}
+        .motto span{color:var(--accent2);font-style:normal;font-weight:600;}
+        .social-row{display:flex;justify-content:center;gap:10px;margin-top:16px;}
+        .social-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s;text-decoration:none;}
+        .social-btn svg{width:17px;height:17px;fill:currentColor;}
+        .social-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+        .social-btn.yt:hover{border-color:#ff0000;color:#ff0000;background:rgba(255,0,0,0.06);}
+
+        #game-content{display:none;position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:30px 20px 80px;}
+        #game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+        .game-title{font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+        .game-title .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent);animation:pulse 2s infinite;}
+        .game-title .logo-dot.warmup-dot{background:var(--warm);box-shadow:0 0 10px var(--warm);}
+        .game-title .logo-dot.audio-dot{background:var(--audio);box-shadow:0 0 10px var(--audio);}
+        .game-title .logo-dot.letter-dot{background:var(--bas);box-shadow:0 0 10px var(--bas);}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.8);}}
+        #warmup-badge{display:none;align-items:center;gap:6px;background:var(--warm-dim);border:1px solid var(--warm-border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--warm);}
+        #audio-badge{display:none;align-items:center;gap:6px;background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--audio);}
+        #letter-badge{display:none;align-items:center;gap:6px;background:var(--bas-dim);border:1px solid var(--bas-border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--bas);}
+
+        #ctrl-hint{display:none;align-items:center;gap:6px;background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--audio);transition:all 0.2s;}
+        #ctrl-hint.active{background:rgba(239,68,68,0.25);border-color:var(--audio);box-shadow:0 0 14px var(--audio-glow);}
+        #ctrl-hint kbd{background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+
+        #audio-countdown{display:none;align-items:center;gap:6px;background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--audio);transition:all 0.2s;}
+        #audio-countdown.active{background:rgba(239,68,68,0.25);border-color:var(--audio);box-shadow:0 0 14px var(--audio-glow);}
+
+        #time-display{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 18px;}
+        #time-display .t-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+        #timer{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--accent2);}
+        #timer.urgent{color:var(--wrong);animation:timerUrgent 0.5s infinite;}
+        #timer.warmup-timer{color:var(--warm);}
+        #timer.audio-timer{color:var(--audio);}
+        #timer.letter-timer{color:var(--bas);}
+        @keyframes timerUrgent{0%,100%{opacity:1;}50%{opacity:0.6;}}
+
+        .text-area-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:var(--glow);transition:border-color 0.3s,box-shadow 0.3s;}
+        .text-area-wrapper.warmup-mode{border-color:var(--warm-border);box-shadow:0 0 40px var(--warm-glow);}
+        .text-area-wrapper.audio-mode{border-color:var(--audio-border);box-shadow:0 0 40px var(--audio-glow);}
+        .text-area-wrapper.letter-mode{border-color:var(--bas-border);box-shadow:0 0 40px var(--bas-glow);}
+        .text-area-hint{padding:10px 20px;font-size:11px;font-weight:500;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+        .text-area-hint::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex-shrink:0;}
+        .text-area-hint.ready{color:var(--accent2);}
+        .text-area-hint.ready::before{background:#4ade80;box-shadow:0 0 8px #4ade80;}
+        .text-area-hint.warmup-hint::before{background:var(--warm);box-shadow:0 0 8px var(--warm);}
+        .text-area-hint.audio-hint{color:var(--audio);}
+        .text-area-hint.audio-hint::before{background:var(--audio);box-shadow:0 0 8px var(--audio);}
+        .text-area-hint.letter-hint{color:var(--bas);}
+        .text-area-hint.letter-hint::before{background:var(--bas);box-shadow:0 0 8px var(--bas);}
+
+        #text{width:100%;min-height:140px;max-height:260px;padding:22px 26px;font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1.8;letter-spacing:0.3px;color:var(--text3);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;scroll-behavior:smooth;}
+        #text::-webkit-scrollbar{width:4px;}
+        #text::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px;}
+        #text.audio-hidden{filter:blur(18px) brightness(0.3);user-select:none;pointer-events:none;transition:filter 0.3s;}
+        #text.audio-reveal{filter:none;transition:filter 0.15s;}
+
+        #audio-placeholder{display:none;min-height:140px;padding:22px 26px;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text3);font-size:13px;letter-height:1.6;text-align:center;}
+        #audio-placeholder.show{display:flex;}
+        #audio-placeholder .big-icon{font-size:36px;opacity:0.4;}
+
+        .correct{color:var(--correct);text-shadow:var(--correct-shadow);font-weight:600;}
+        body.theme-light .correct{background:rgba(8,145,178,0.1);border-radius:2px;}
+        .wrong{color:var(--wrong);text-shadow:var(--wrong-shadow);text-decoration:underline wavy rgba(248,113,113,0.5);}
+        .wrong-space{background:rgba(248,113,113,0.18);border-radius:2px;}
+        .current-letter{background:var(--accent-dim);border-bottom:2px solid var(--cursor);border-radius:2px;animation:cursorBlink 1s infinite;}
+        @keyframes cursorBlink{0%,100%{border-color:var(--cursor);}50%{border-color:transparent;}}
+        .para-block{display:block;margin-bottom:6px;}
+        .para-block+.para-block{margin-top:18px;padding-top:14px;border-top:1px dashed var(--border);}
+        .para-done{opacity:0.85;}
+        .para-next{opacity:0.22;font-size:17px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--border);display:block;}
+
+        .input-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+        .input-wrapper:focus-within{border-color:var(--border-accent);box-shadow:0 0 0 3px var(--accent-dim);}
+        .input-wrapper.warmup-focus:focus-within{border-color:var(--warm-border);box-shadow:0 0 0 3px var(--warm-dim);}
+        .input-wrapper.audio-focus:focus-within{border-color:var(--audio-border);box-shadow:0 0 0 3px var(--audio-dim);}
+        .input-wrapper.letter-focus:focus-within{border-color:var(--bas-border);box-shadow:0 0 0 3px var(--bas-dim);}
+        #input{width:100%;min-height:90px;padding:18px 22px;font-size:20px;font-family:'JetBrains Mono',monospace;line-height:1.7;border:none;background:transparent;color:var(--text);outline:none;resize:none;overflow-y:auto;scrollbar-width:none;}
+        #input::-webkit-scrollbar{display:none;}
+        #input::placeholder{color:var(--text3);font-style:italic;}
+
+        /* ── Game footer ── */
+        .game-footer{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:20px;}
+        .footer-row{display:flex;gap:10px;justify-content:center;}
+        .btn-finish{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.3);color:#f87171;}
+        .btn-finish:hover{background:rgba(248,113,113,0.15);border-color:#f87171;}
+        .btn-restart{background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.3);color:var(--accent2);}
+        .btn-restart:hover{background:rgba(6,182,212,0.15);border-color:var(--accent);}
+        .btn-speed-toggle{background:var(--audio-dim);border-color:var(--audio-border);color:var(--audio);}
+        .btn-speed-toggle:hover{background:rgba(239,68,68,0.15);border-color:var(--audio);}
+        .btn-lock{background:var(--audio-dim);border-color:var(--audio-border);color:var(--audio);}
+        .btn-lock:hover{background:rgba(239,68,68,0.15);border-color:var(--audio);}
+        .btn-lock.locked{background:rgba(239,68,68,0.25);border-color:var(--audio);box-shadow:0 0 10px var(--audio-glow);font-weight:700;}
+        #back-btn{position:fixed;bottom:24px;right:24px;z-index:10;font-size:13px !important;padding:9px 18px !important;}
+
+        /* ── Sesli mod: hız slider ── */
+        #audio-speed-wrap{display:none;align-items:center;gap:10px;background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:12px;padding:8px 16px;}
+        #audio-speed-wrap.show{display:flex;}
+        #audio-speed-wrap label{font-size:11px;font-weight:700;color:var(--audio);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+        #speed-slider{-webkit-appearance:none;appearance:none;width:150px;height:4px;border-radius:4px;background:linear-gradient(to right, var(--audio) 0%, var(--audio) 40%, var(--border-strong) 40%);outline:none;cursor:pointer;}
+        #speed-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--audio);border:2px solid var(--bg2);box-shadow:0 0 8px var(--audio-glow);cursor:pointer;}
+        #speed-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--audio);border:2px solid var(--bg2);cursor:pointer;}
+        #speed-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--audio);min-width:38px;text-align:right;}
+
+        #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:999;}
+        #result-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--modal-bg);border:1px solid var(--border-strong);padding:0;border-radius:20px;box-shadow:var(--shadow);z-index:1000;width:95%;max-width:560px;max-height:88vh;animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);overflow:hidden;transition:max-width 0.3s;}
+        #result-modal.expanded{max-width:920px;}
+        @keyframes modalIn{from{opacity:0;transform:translate(-50%,-50%) scale(0.92);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+        .modal-wrapper{display:flex;height:100%;}
+        .modal-left{flex:0 0 auto;width:100%;padding:34px;overflow-y:auto;max-height:88vh;transition:width 0.3s;}
+        #result-modal.expanded .modal-left{width:460px;}
+        .modal-left::-webkit-scrollbar{width:4px;}
+        .modal-left::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+        .modal-right{flex:1;display:none;flex-direction:column;border-left:1px solid var(--border);padding:34px;overflow-y:auto;background:var(--surface);max-height:88vh;}
+        .modal-right.show{display:flex;}
+        .modal-right::-webkit-scrollbar{width:4px;}
+        .modal-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+        .modal-header{margin-bottom:28px;}
+        .modal-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+        .modal-title-row h2{font-size:24px;font-weight:800;color:var(--text);}
+        .time-badge{background:var(--accent-dim);border:1px solid var(--border-accent);color:var(--accent2);font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+        .modal-sub{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+        .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+        .stat-box{background:var(--surface);border:1px solid var(--border);padding:18px 16px;border-radius:12px;text-align:center;transition:all 0.25s;}
+        .stat-box:hover{border-color:var(--border-accent);background:var(--accent-dim);}
+        .stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;}
+        .stat-value{font-size:30px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;}
+        .stat-value.highlight{color:var(--accent2);}
+        .modal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+        .modal-btns button{padding:9px 18px !important;font-size:13px !important;font-weight:600;}
+        .error-title{font-size:13px;font-weight:700;color:var(--wrong);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+        .error-item{background:var(--surface);border:1px solid var(--border);border-left:3px solid rgba(248,113,113,0.4);padding:12px;border-radius:10px;margin-bottom:8px;font-size:12px;}
+        .error-item:hover{border-left-color:var(--wrong);}
+        .error-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;}
+        .error-expected{color:#4ade80;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;}
+        .error-actual{color:var(--wrong);font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;}
+        .success-msg{color:#4ade80;text-align:center;padding:20px;font-size:14px;font-weight:600;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:10px;}
+
+        .error-item.audio-err{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.5);border-left-color:#ef4444;}
+        .error-item.audio-err .error-lbl{color:var(--audio);}
+
+        #audio-transcript-box{display:none;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.9;color:var(--text2);margin-bottom:18px;}
+        #audio-transcript-box.show{display:block;}
+        #audio-transcript-box .aud-title{font-size:10px;font-weight:700;color:var(--audio);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:block;}
+        #audio-transcript-box .aud-correct{color:var(--correct);}
+        #audio-transcript-box .aud-wrong{color:var(--wrong);background:rgba(248,113,113,0.18);border-radius:3px;padding:0 2px;}
+        #audio-transcript-box .aud-untouched{color:var(--text3);opacity:0.6;}
+
+        #warmup-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--modal-bg);border:1px solid var(--warm-border);padding:36px;border-radius:20px;box-shadow:var(--shadow),0 0 40px var(--warm-glow);z-index:1000;width:90%;max-width:380px;text-align:center;animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+        .warmup-modal-icon{font-size:44px;margin-bottom:14px;}
+        .warmup-modal-title{font-size:22px;font-weight:800;color:var(--warm);margin-bottom:8px;}
+        .warmup-modal-sub{font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6;}
+        .warmup-modal-btns{display:flex;gap:10px;justify-content:center;}
+        .btn-warm-main{padding:11px 22px !important;font-size:14px !important;font-weight:700;background:linear-gradient(135deg,var(--warm),#fbbf24) !important;border:none !important;color:#fff !important;border-radius:10px !important;}
+        .btn-warm-main:hover{opacity:0.9;transform:translateY(-1px);}
+
+        #ai-sidebar{position:fixed;top:0;left:-330px;width:310px;height:100vh;background:var(--bg2);border-right:1px solid var(--border-strong);box-shadow:10px 0 40px rgba(0,0,0,0.3);z-index:3000;transition:left 0.4s cubic-bezier(0.1,0.9,0.2,1);display:flex;flex-direction:column;}
+        #ai-sidebar.open{left:0;}
+        .ai-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+        .ai-header h3{font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+        .ai-header h3 span{width:28px;height:28px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+        .ai-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;box-shadow:none;}
+        .ai-close:hover{color:var(--text);background:var(--surface-hover);}
+        .ai-messages{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;}
+        .ai-messages::-webkit-scrollbar{display:none;}
+        .chat-msg{padding:10px 14px;border-radius:12px;max-width:88%;font-size:13px;line-height:1.5;word-wrap:break-word;white-space:pre-line;}
+        .chat-ai{background:var(--surface);color:var(--text);align-self:flex-start;border:1px solid var(--border);border-bottom-left-radius:3px;}
+        .chat-user{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+        .ai-suggestions{padding:6px 16px;display:flex;flex-direction:column;gap:5px;}
+        .suggest-btn{background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:7px 12px;border-radius:8px;text-align:left;cursor:pointer;box-shadow:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+        .suggest-btn:hover{background:var(--accent-dim);border-color:var(--border-accent);color:var(--accent2);}
+        .ai-input-area{padding:14px;border-top:1px solid var(--border);display:flex;gap:8px;}
+        #ai-input{flex:1;background:var(--bg3);border:1px solid var(--border-strong);color:var(--text);padding:8px 12px;border-radius:8px;outline:none;font-size:13px;font-family:'Inter',sans-serif;}
+        #ai-input:focus{border-color:var(--accent);}
+        .ai-send{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;padding:0 14px;font-size:14px;border-radius:8px;color:white;cursor:pointer;}
+        .ai-send:hover{opacity:0.85;}
+
+        @media(max-width:900px){.modal-left{width:100% !important;}.modal-right{border-left:none;border-top:1px solid var(--border);}.modal-wrapper{flex-direction:column;}}
+        @media(max-width:600px){#game-content{padding:20px 14px 70px;}#text{font-size:17px;padding:16px 18px;}#input{font-size:17px;padding:14px 18px;}}
+    </style>
+</head>
+<body>
+
+<button id="theme-toggle" onclick="toggleTheme()">☀</button>
+
+<div id="toast-stack"></div>
+
+<div id="levelup-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--modal-bg);border:1px solid var(--border-accent);padding:36px;border-radius:20px;box-shadow:var(--shadow),0 0 40px var(--accent-glow);z-index:1000;width:90%;max-width:380px;text-align:center;animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);">
+    <div style="font-size:44px;margin-bottom:14px;">🎉</div>
+    <div style="font-size:22px;font-weight:800;color:var(--accent2);margin-bottom:8px;">Seviye Atladın!</div>
+    <div id="levelup-text" style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6;"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn-warm-main" style="background:linear-gradient(135deg,var(--accent),var(--accent2)) !important;" onclick="closeLevelUpModal()">Harika!</button>
+    </div>
+</div>
+
+<audio id="dictation-audio" preload="auto" style="display:none;position:absolute;left:-9999px;">
+    <source id="dictation-src" src="" type="audio/mpeg">
+</audio>
+
+<!-- AI Sidebar -->
+<div id="ai-sidebar">
+    <div class="ai-header">
+        <h3><span>⌨</span> Keyboard AI</h3>
+        <button class="ai-close" onclick="toggleAi()">✕</button>
+    </div>
+    <div class="ai-messages" id="ai-chat">
+        <div class="chat-msg chat-ai">Merhaba! Hız, doğruluk veya pratik teknikleri hakkında soru sorabilirsin. 🎯</div>
+    </div>
+    <div class="ai-suggestions">
+        <button class="suggest-btn" onclick="sendSuggestion('Nasıl hızlanabilirim?')">💡 Nasıl hızlanabilirim?</button>
+        <button class="suggest-btn" onclick="sendSuggestion('Klavyeye bakmama taktikleri nelerdir?')">⌨️ Bakmama taktikleri</button>
+    </div>
+    <div class="ai-input-area">
+        <input type="text" id="ai-input" placeholder="Mesaj yazın..." onkeypress="if(event.key==='Enter') sendAiMessage()">
+        <button class="ai-send" onclick="sendAiMessage()">➜</button>
+    </div>
+</div>
+
+<!-- Right Panel (Mod & Zorluk) -->
+<div id="right-panel" class="side-panel">
+  <div class="panel-header">
+    <h3>🎚 Mod & Zorluk Seç</h3>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active-tab ileri" id="tab-ileri" onclick="switchTab('ileri')">⚡ İleri Düzey</button>
+    <button class="tab-btn" id="tab-rozet" onclick="switchTab('rozet')">🏆 Rozetler</button>
+  </div>
+  <div class="panel-body">
+    <div id="pane-ileri" class="tab-pane active">
+      <div class="lvl-pill" onclick="switchTab('rozet')">
+        <div class="lvl-badge-circle" id="lvl-circle">1</div>
+        <div class="lvl-info">
+          <div class="lvl-name"><span id="lvl-name-text">Seviye 1</span><span class="lvl-rozet-count" id="lvl-rozet-count">0/0 🏆</span></div>
+          <div class="lvl-rank-text" id="lvl-rank-text">🌱 Acemi</div>
+          <div class="lvl-xp-text" id="lvl-xp-text">0 / 100 XP</div>
+          <div class="lvl-bar-track"><div class="lvl-bar-fill" id="lvl-bar-fill" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="diff-section-title">Temel Çalışmalar</div>
+      <button class="diff-item warmup" id="dp-0" onclick="selectDiffPanel(0,this)">🔥 <span>Isınma</span><span class="diff-badge badge-warm">30sn</span></button>
+      <button class="diff-item letter" id="dp-11" onclick="selectDiffPanel(11,this)">🔤 <span>Harf Çalışmaları</span><span class="diff-badge badge-letter">SÜRESİZ</span></button>
+      <div class="diff-section-title">Zorluk Seviyeleri</div>
+      <button class="diff-item" id="dp-1" onclick="selectDiffPanel(1,this)">🟢 <span>Kolay</span><span class="diff-badge badge-easy" id="badge-1">LVL 6</span></button>
+      <button class="diff-item" id="dp-2" onclick="selectDiffPanel(2,this)">🟡 <span>Orta</span><span class="diff-badge badge-mid" id="badge-2">LVL 9</span></button>
+      <button class="diff-item" id="dp-3" onclick="selectDiffPanel(3,this)">🟠 <span>Zor</span><span class="diff-badge badge-hard" id="badge-3">LVL 15</span></button>
+      <button class="diff-item" id="dp-4" onclick="selectDiffPanel(4,this)">🔴 <span>Ultra Zor</span><span class="diff-badge badge-ultra" id="badge-4">LVL 30</span></button>
+      <button class="diff-item pro" id="dp-6" onclick="selectDiffPanel(6,this)">🟣 <span>Profesyonel</span><span class="diff-badge badge-pro" id="badge-6">LVL 45</span></button>
+      <div class="diff-section-title" style="margin-top:16px;">Özel Mod · Son Rank</div>
+      <button class="diff-item audio" id="dp-5" onclick="selectDiffPanel(5,this)">🔊 <span>Sesli Metin</span><span class="diff-badge badge-audio" id="badge-5">LVL 45</span></button>
+      <div class="locked-info" id="locked-info"></div>
+      <div class="time-section">
+        <span class="ts-label">⏱ Süre (dakika)</span>
+        <div class="time-row">
+          <input type="number" id="time-input-panel" min="1" max="30" value="1">
+          <button onclick="saveTimePanel()">Kaydet</button>
+        </div>
+        <div class="time-current">Mevcut: <span id="panel-time-display" style="color:var(--accent2);font-family:'JetBrains Mono',monospace;font-weight:700;">1 dk</span></div>
+      </div>
+      <div style="margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:11px;color:var(--text3);line-height:1.7;">
+        💡 <strong style="color:var(--text2);">İpucu:</strong> Sesli modda <kbd style="background:var(--bg3);border:1px solid var(--border-strong);border-radius:4px;padding:1px 6px;font-size:10px;">Ctrl</kbd> tuşu ile sesi kontrol edebilirsin.
+      </div>
+      <div style="margin-top:10px;text-align:right;">
+        <span id="yonetici-toggle" onclick="toggleYoneticiPanel()" style="cursor:pointer;font-size:9px;color:var(--text3);opacity:0.45;user-select:none;" title="Yönetici Paneli (kurucu) — şifre gerektirir">⚙️ yönetici paneli</span>
+      </div>
+      <div id="yonetici-panel" style="display:none;margin-top:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;">
+        <div id="yonetici-login">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">🔒 Yönetici şifresi:</div>
+          <div style="display:flex;gap:6px;">
+            <input type="password" id="yonetici-sifre-input" onkeydown="if(event.key==='Enter')yoneticiGirisYap();" style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border-strong);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;" placeholder="Şifre">
+            <button onclick="yoneticiGirisYap()" style="font-size:11px;padding:6px 12px;border-radius:6px;border:none;background:var(--accent);color:#fff;cursor:pointer;flex-shrink:0;">Giriş</button>
+          </div>
+          <div id="yonetici-login-hata" style="display:none;color:#ef4444;font-size:10px;margin-top:6px;">❌ Yanlış şifre.</div>
+        </div>
+        <div id="yonetici-actions" style="display:none;">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px;">✅ Yönetici girişi yapıldı.</div>
+          <button onclick="V4rinthLevelEkle()" style="width:100%;margin-bottom:6px;font-size:11px;padding:8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg3);color:var(--text2);cursor:pointer;">➕ Level Ekle / Ayarla</button>
+          <button onclick="V4rinthLevelleriSifirlaCore()" style="width:100%;font-size:11px;padding:8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg3);color:var(--text2);cursor:pointer;">🗑️ Levelleri Sıfırla</button>
+        </div>
+      </div>
+    </div>
+    <div id="pane-rozet" class="tab-pane">
+      <div class="rozet-summary"><span id="rozet-unlocked-count">0</span>/<span id="rozet-total-count">0</span> rozet açıldı · Seviye <span id="rozet-lvl-text">1</span></div>
+      <div class="rozet-grid" id="rozet-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Menu -->
+<div id="main-menu">
+  <div class="menu-logo">
+    <div class="menu-logo-icon">⌨</div>
+    <h1>MrVarinth</h1>
+  </div>
+  <div class="menu-tagline">10 Parmak Klavye Hız Testi</div>
+  <div class="lvl-pill" onclick="openPanel(); switchTab('rozet');">
+    <div class="lvl-badge-circle" id="lvl-circle-menu">1</div>
+    <div class="lvl-info">
+      <div class="lvl-name"><span id="lvl-name-text-menu">Seviye 1</span><span class="lvl-rozet-count" id="lvl-rozet-count-menu">0/0 🏆</span></div>
+      <div class="lvl-rank-text" id="lvl-rank-text-menu">🌱 Acemi</div>
+      <div class="lvl-xp-text" id="lvl-xp-text-menu">0 / 100 XP</div>
+      <div class="lvl-bar-track"><div class="lvl-bar-fill" id="lvl-bar-fill-menu" style="width:0%;"></div></div>
+    </div>
+  </div>
+  <div class="menu-sel-row">
+    <div class="sel-pill" onclick="openPanel()" title="Zorluk değiştir">
+      <div class="sp-label">Zorluk</div>
+      <div class="sp-val" id="menu-difficulty-val">🟢 Kolay</div>
+      <div class="sp-hint">tıkla ▸</div>
+    </div>
+    <div class="sel-pill" onclick="toggleTimePanel()" title="Süre ayarla">
+      <div class="sp-label">Süre</div>
+      <div class="sp-val"><span id="menu-time">1</span> dk</div>
+      <div class="sp-hint">tıkla ▸</div>
+    </div>
+  </div>
+  <div id="time-panel" style="display:none;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;">
+    <label style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Dakika Girin (1–30)</label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="number" id="time-input" min="1" max="30" value="1" style="width:80px;padding:8px 12px;font-size:15px;font-family:'JetBrains Mono',monospace;background:var(--bg3);border:1px solid var(--border-strong);color:var(--text);border-radius:8px;text-align:center;outline:none;">
+      <button onclick="saveTime()" style="padding:8px 16px !important;font-size:13px !important;">Kaydet</button>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startGame()">▶ BAŞLA</button>
+  <div class="menu-row">
+    <button class="btn-outline-acc" onclick="openPanel()">🎚 Zorluk Seç</button>
+  </div>
+  <div class="motto">"Çalışmak azim ister, <span>gerisi sadece zamandır</span>."</div>
+  <div class="social-row">
+    <div class="social-btn" onclick="toggleAi()" title="AI ile Sohbet">
+      <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 1.94.56 3.76 1.5 5.32L2 22l4.83-1.44A9.95 9.95 0 0 0 12 22a10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/></svg>
+    </div>
+    <a href="https://www.youtube.com/channel/UCWbkv0mQd5_4LplDH5nkiLw" target="_blank" class="social-btn yt" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <button class="social-btn" onclick="V4rinthLevelleriSifirla()" title="Levelleri Sıfırla — onay gerektirir" style="margin-left:auto;border-color:rgba(239,68,68,0.35);color:#ef4444;background:rgba(239,68,68,0.08);">
+      <span style="font-size:16px;line-height:1;">🗑️</span>
+    </button>
+  </div>
+</div>
+
+<!-- Game Content -->
+<div id="game-content">
+    <div id="game-header">
+        <!-- Sol: logo + ctrl hint yan yana -->
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="game-title">
+                <div class="logo-dot" id="header-dot"></div>
+                MrVarinth
+            </div>
+            <div id="audio-countdown"></div>
+        </div>
+        <!-- Sağ: rozetler + ctrl hint + timer -->
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div id="warmup-badge"><span>🔥</span><span>ISINMA</span></div>
+            <div id="letter-badge"><span>🔤</span><span>HARF ÇALIŞMASI</span></div>
+            <div id="audio-badge"><span>🔊</span><span>Sesi Dinle ➡️</span></div>
+            <div id="ctrl-hint"><kbd>Ctrl</kbd> → Aç / Kapat</div>
+            <div id="time-display">
+                <span class="t-label">Süre</span>
+                <span id="timer">60</span><span style="font-size:13px;color:var(--text3);font-family:'JetBrains Mono'">s</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-area-wrapper" id="text-area-wrapper">
+        <div class="text-area-hint" id="text-hint">Paragrafı bitirince Enter'a bas</div>
+        <div id="text"></div>
+        <div id="audio-placeholder">
+            <div class="big-icon">🎧</div>
+            <div><kbd style="background:var(--audio-dim);border:1px solid var(--audio-border);border-radius:5px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--audio);">Ctrl</kbd> tuşuna bas, sesi dinle, yaz</div>
+        </div>
+    </div>
+
+    <div class="input-wrapper" id="input-wrapper">
+        <textarea id="input" placeholder="Yazmaya başla..."></textarea>
+    </div>
+
+    <!-- Sesli mod hız ayarı -->
+    <div id="audio-speed-wrap">
+        <label>🔊 Hız</label>
+        <input type="range" id="speed-slider" min="0.5" max="1.5" step="0.05" value="0.90" oninput="onSpeedSlider(this.value)">
+        <span id="speed-val">0.90x</span>
+    </div>
+
+    <!-- Footer: üst satır ReStart + Testi Bitir, alt satır Hız Ayarı + Kilit -->
+    <div class="game-footer">
+        <div class="footer-row">
+            <button class="btn-restart" onclick="restartGame()">↺ ReStart</button>
+            <button class="btn-finish" onclick="finishGame()">✕ Testi Bitir</button>
+        </div>
+        <div class="footer-row">
+            <button id="speed-toggle-btn" class="btn-speed-toggle" onclick="toggleSpeedPanel()" style="display:none;">🔊 Hız Ayarı</button>
+            <button id="lock-btn" class="btn-lock" onclick="toggleLock()" style="display:none;">🔓 CTRL</button>
+        </div>
+    </div>
+</div>
+
+<div id="overlay"></div>
+
+<div id="warmup-modal">
+    <div class="warmup-modal-icon">🔥</div>
+    <div class="warmup-modal-title">Isınma Tamamlandı!</div>
+    <div class="warmup-modal-sub">30 saniyelik ısınma bitti. Artık gerçek teste geçmeye hazırsın!</div>
+    <div class="warmup-modal-btns">
+        <button onclick="closeWarmupModal()">Kapat</button>
+        <button class="btn-warm-main" onclick="startRealAfterWarmup()">▶ Teste Geç</button>
+    </div>
+</div>
+
+<div id="result-modal">
+    <div class="modal-wrapper">
+        <div class="modal-left">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h2>⏱ Test Bitti!</h2>
+                    <span class="time-badge" id="modal-time-badge">1 dk</span>
+                </div>
+                <div class="modal-sub">Sonuçlarını Görelim</div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-label">📊 Toplam Karakter</div><div class="stat-value" id="chars">0</div></div>
+                <div class="stat-box"><div class="stat-label">🎯 Net Puan</div><div class="stat-value highlight" id="net">0</div></div>
+                <div class="stat-box"><div class="stat-label">⚡ Dakikalık Vuruş</div><div class="stat-value highlight" id="dpm">0</div></div>
+                <div class="stat-box"><div class="stat-label">❌ Toplam Hata</div><div class="stat-value" id="errors">0</div></div>
+            </div>
+            <div class="modal-btns">
+                <button onclick="closeResult()">Kapat</button>
+                <button id="show-details-btn" onclick="showDetails()">Detayları Göster</button>
+                <button id="hide-details-btn" style="display:none;" onclick="hideDetails()">Detayları Gizle</button>
+            </div>
+        </div>
+        <div class="modal-right" id="modal-right">
+            <div id="audio-transcript-box"></div>
+            <div class="error-title">❌ Hatalı Kelimeler</div>
+            <div id="error-list"></div>
+        </div>
+    </div>
+</div>
+
+<button id="back-btn" style="display:none;" onclick="backToMenu()">← Geri Dön</button>
+
+<script>
+const sesMetinleriKlasoru = "V4rinth ses metinleri";
+const mp3Dosyalari = ["metin1.mp3","metin2.mp3","metin3.mp3"];
+
+let audioSpeed = 0.90;
+let audioDuration = 0;
+let audioTimerReady = false;
+let selectedAudioIndex = 0;
+let audioTranscriptText = "";
+let audioTranscriptReady = false;
+
+/* ══════════════════ SEVİYE & ROZET SİSTEMİ ══════════════════ */
+const STORAGE_KEY = "mrvarinth_progress_v1";
+
+const ROZETLER = [
+    { id:"ilk_adim",    icon:"🎯", title:"İlk Adım",        desc:"İlk testini tamamla",            check:s => s.testsCompleted >= 1 },
+    { id:"on_test",     icon:"📈", title:"Kararlılık",       desc:"15 test tamamla",                check:s => s.testsCompleted >= 15 },
+    { id:"elli_test",   icon:"🧱", title:"Demir İrade",      desc:"75 test tamamla",                check:s => s.testsCompleted >= 75 },
+    { id:"yuz_test",    icon:"🏛️", title:"Veteran",         desc:"150 test tamamla",               check:s => s.testsCompleted >= 150 },
+    { id:"kusursuz",    icon:"💎", title:"Kusursuz",         desc:"Hatasız bir test bitir",         check:s => s.perfectTests >= 1 },
+    { id:"kusursuz5",   icon:"👑", title:"Mükemmeliyetçi",   desc:"8 hatasız test bitir",           check:s => s.perfectTests >= 8 },
+    { id:"hiz200",      icon:"⚡", title:"Hız Tutkunu",      desc:"Bir testte 250+ net/dk yap",     check:s => s.bestDpm >= 250 },
+    { id:"hiz350",      icon:"🚀", title:"Hız Canavarı",     desc:"Bir testte 400+ net/dk yap",     check:s => s.bestDpm >= 400 },
+    { id:"hiz500",      icon:"🌪️", title:"Şimşek",          desc:"Bir testte 600+ net/dk yap",     check:s => s.bestDpm >= 600 },
+    { id:"isinma10",    icon:"🔥", title:"Isınma Ustası",    desc:"15 kez ısınma yap",              check:s => s.warmupCount >= 15 },
+    { id:"harf10",      icon:"🔤", title:"Harf Ustası",      desc:"Harf Çalışmaları'nı 10 kez tamamla", check:s => (s.diffCounts[11]||0) >= 10 },
+    { id:"orta5",       icon:"🟡", title:"Orta Yolcu",       desc:"Orta seviyede 8 test bitir",     check:s => (s.diffCounts[2]||0) >= 8 },
+    { id:"zor5",        icon:"🟠", title:"Zorlu Yolcu",      desc:"Zor seviyede 8 test bitir",      check:s => (s.diffCounts[3]||0) >= 8 },
+    { id:"ultra5",      icon:"🔴", title:"Efsane",           desc:"Ultra Zor'da 8 test bitir",      check:s => (s.diffCounts[4]||0) >= 8 },
+    { id:"pro5",        icon:"🟣", title:"Profesyonel Ruh",  desc:"Profesyonel modda 8 test bitir", check:s => (s.diffCounts[6]||0) >= 8 },
+    { id:"sesli5",      icon:"🔊", title:"Kulak Ustası",     desc:"Sesli Metin modunda 8 test bitir", check:s => (s.diffCounts[5]||0) >= 8 },
+    { id:"seviye5",     icon:"🥈", title:"Yükselen Yıldız",  desc:"Seviye 5'e ulaş",                check:s => calcLevel(s.totalXp).level >= 5 },
+    { id:"seviye10",    icon:"🥇", title:"Klavye Şampiyonu", desc:"Seviye 12'ye ulaş",              check:s => calcLevel(s.totalXp).level >= 12 },
+    { id:"seviye20",    icon:"🏆", title:"Efsanevi Usta",    desc:"Seviye 25'e (Pro) ulaş",         check:s => calcLevel(s.totalXp).level >= 25 },
+    { id:"azimli",      icon:"📅", title:"Azimli",           desc:"8 farklı günde pratik yap",      check:s => s.playDates.length >= 8 },
+];
+
+/* ══════════════ SEVİYE / RÜTBE / KİLİT AYARLARI ══════════════
+   NOT: Bu ayarlar artık "V4rinth paragraf metinleri/seviyeYonetimi.js"
+   dosyasından (V4rinthSeviyeAyarlari, şifre korumalı yönetici modülü)
+   okunuyor. Aşağıdaki gömülü değerler sadece o dosya yüklenemezse
+   devreye giren YEDEK (fallback) içeriktir. */
+const _seviyeDisaridanGeldi = (typeof V4rinthSeviyeAyarlari !== "undefined" && V4rinthSeviyeAyarlari);
+const _seviyeKaynak = _seviyeDisaridanGeldi ? V4rinthSeviyeAyarlari : {
+    RANKS: [
+        { name:"Acemi",     icon:"🌱", minLevel:1  },
+        { name:"Çırak",     icon:"🔧", minLevel:5  },
+        { name:"Yetenekli", icon:"⭐", minLevel:10 },
+        { name:"Uzman",     icon:"🎖️", minLevel:15 },
+        { name:"Usta",      icon:"💠", minLevel:20 },
+        { name:"Pro",       icon:"👑", minLevel:25 },
+    ],
+    DIFFICULTIES: [
+        { id:0,  name:"Isınma",           icon:"🔥", unlockLevel:1  },
+        { id:11, name:"Harf Çalışmaları", icon:"🔤", unlockLevel:1  },
+        { id:1,  name:"Kolay",            icon:"🟢", unlockLevel:3  },
+        { id:2,  name:"Orta",             icon:"🟡", unlockLevel:7  },
+        { id:3,  name:"Zor",              icon:"🟠", unlockLevel:12 },
+        { id:4,  name:"Ultra Zor",        icon:"🔴", unlockLevel:18 },
+        { id:6,  name:"Profesyonel",      icon:"🟣", unlockLevel:22 },
+        { id:5,  name:"Sesli Metin",      icon:"🔊", unlockLevel:25 },
+    ],
+    ALWAYS_OPEN_DIFFS: [],
+    AUTO_SELECT_EXCLUDE: [0, 11],
+    xpForLevel(level) { return Math.round(140 + (level - 1) * 75 + Math.pow(level, 1.55) * 9); }
+};
+console.log(_seviyeDisaridanGeldi
+    ? "[MrVarinth] Seviye sistemi DIŞARIDAN yüklendi: V4rinth paragraf metinleri/seviyeYonetimi.js"
+    : "[MrVarinth] UYARI: seviyeYonetimi.js bulunamadı/yüklenemedi, gömülü YEDEK ayarlar kullanılıyor.");
+
+/* Rütbe (rank) sistemi — seviyeye göre */
+const RANKS = _seviyeKaynak.RANKS;
+
+function calcRank(level) {
+    let r = RANKS[0];
+    for (const rk of RANKS) { if (level >= rk.minLevel) r = rk; }
+    return r;
+}
+
+/* Zorluklar seviye arttıkça sırayla açılır; Isınma (0) ve Harf Çalışmaları (11) dahil
+   hepsi DIFF_UNLOCK_LEVEL'e göre kilitlenip açılır (varsayılan Lvl 1). */
+const DIFFICULTIES = _seviyeKaynak.DIFFICULTIES;
+const DIFF_UNLOCK_LEVEL = {};
+DIFFICULTIES.forEach(d => { DIFF_UNLOCK_LEVEL[d.id] = d.unlockLevel; });
+const ALWAYS_OPEN_DIFFS = _seviyeKaynak.ALWAYS_OPEN_DIFFS;
+const AUTO_SELECT_EXCLUDE = _seviyeKaynak.AUTO_SELECT_EXCLUDE || [];
+
+/* Zorluk butonlarındaki "LVL X" rozet yazıları HTML'de sabit metin olarak
+   duruyordu ve gerçek DIFF_UNLOCK_LEVEL değerleriyle uyuşmuyordu — kafa
+   karışıklığına yol açıyordu. Sayfa yüklenince gerçek değerlerle senkron
+   edilir. (Isınma/Harf Çalışmaları badge'leri "30sn"/"SÜRESİZ" özel
+   metinler olduğu için dokunulmaz.) */
+function v4rinthRozetleriSenkronize() {
+    DIFFICULTIES.forEach(d => {
+        const badge = document.getElementById("badge-" + d.id);
+        if (badge) badge.textContent = "LVL " + d.unlockLevel;
+    });
+}
+
+function defaultProgress() {
+    return {
+        totalXp: 0,
+        testsCompleted: 0,
+        perfectTests: 0,
+        bestDpm: 0,
+        warmupCount: 0,
+        diffCounts: { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 11:0 },
+        playDates: [],
+        unlockedBadges: [],
+        unlockedDiffs: {}
+    };
+}
+
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultProgress();
+        const parsed = JSON.parse(raw);
+        return Object.assign(defaultProgress(), parsed, {
+            diffCounts: Object.assign({1:0,2:0,3:0,4:0,5:0,6:0,11:0}, parsed.diffCounts || {}),
+            unlockedDiffs: Object.assign({}, parsed.unlockedDiffs || {})
+        });
+    } catch (e) { return defaultProgress(); }
+}
+
+function saveProgress() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); } catch (e) {}
+}
+
+let progress = loadProgress();
+
+/* Seviye ilerlemesi belirgin şekilde zorlaştırıldı: ihtiyaç duyulan XP hem doğrusal
+   hem de seviye arttıkça hızlanan (üstel) bir bileşenle büyür.
+   Formül de artık V4rinthSeviyeAyarlari.xpForLevel() üzerinden (seviyeYonetimi.js) geliyor. */
+function xpForLevel(level) {
+    return _seviyeKaynak.xpForLevel(level);
+}
+
+function calcLevel(totalXp) {
+    let level = 1, remaining = totalXp, need = xpForLevel(level);
+    while (remaining >= need) { remaining -= need; level++; need = xpForLevel(level); }
+    return { level, currentXp: remaining, neededXp: need };
+}
+
+function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+}
+
+function showToast(opts) {
+    const stack = document.getElementById("toast-stack");
+    const el = document.createElement("div");
+    el.className = "toast" + (opts.level ? " toast-level" : "");
+    el.innerHTML = `<div class="toast-icon">${opts.icon}</div><div><div class="toast-title">${opts.title}</div><div class="toast-sub">${opts.sub}</div></div>`;
+    stack.appendChild(el);
+    setTimeout(() => {
+        el.classList.add("toast-out");
+        setTimeout(() => el.remove(), 350);
+    }, 3200);
+}
+
+function closeLevelUpModal() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("levelup-modal").style.display = "none";
+}
+
+function applyTestResult({ diff, netScore, dpm, errors, isWarmupTest, isLetterTest }) {
+    const before = calcLevel(progress.totalXp);
+
+    progress.testsCompleted++;
+    const today = todayStr();
+    if (!progress.playDates.includes(today)) progress.playDates.push(today);
+
+    if (isWarmupTest) {
+        progress.warmupCount++;
+        progress.totalXp += 4;
+    } else if (isLetterTest) {
+        // Harf çalışmaları süresiz olduğundan hız değil tamamlama ödüllendirilir.
+        if (progress.diffCounts[11] !== undefined) progress.diffCounts[11]++;
+        let xpGain = 8;
+        if (errors === 0) xpGain += 6;
+        progress.totalXp += xpGain;
+    } else {
+        if (errors === 0) progress.perfectTests++;
+        if (dpm > progress.bestDpm) progress.bestDpm = dpm;
+        if (progress.diffCounts[diff] !== undefined) progress.diffCounts[diff]++;
+        const diffMult = { 1:1, 2:1.25, 3:1.55, 4:1.9, 5:2.4, 6:2.65 }[diff] || 1;
+        let xpGain = Math.max(4, Math.round((netScore / 14) * diffMult));
+        if (errors === 0) xpGain += 12;
+        progress.totalXp += Math.round(xpGain);
+    }
+
+    const after = calcLevel(progress.totalXp);
+
+    const newlyUnlocked = [];
+    ROZETLER.forEach(r => {
+        if (!progress.unlockedBadges.includes(r.id) && r.check(progress)) {
+            progress.unlockedBadges.push(r.id);
+            newlyUnlocked.push(r);
+        }
+    });
+
+    saveProgress();
+    updateLevelUI();
+
+    newlyUnlocked.forEach((r, i) => {
+        setTimeout(() => showToast({ icon: r.icon, title: "Rozet Açıldı!", sub: r.title }), i * 700);
+    });
+
+    if (after.level > before.level) {
+        setTimeout(() => {
+            document.getElementById("levelup-text").textContent =
+                "Tebrikler! Seviye " + after.level + " oldun. Yeni modlar açılmış olabilir, Zorluk panelini kontrol et.";
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("levelup-modal").style.display = "block";
+        }, newlyUnlocked.length * 700 + 200);
+    }
+}
+
+function updateLevelUI() {
+    const { level, currentXp, neededXp } = calcLevel(progress.totalXp);
+    const pct = Math.min(100, Math.round((currentXp / neededXp) * 100));
+    const unlockedCount = progress.unlockedBadges.length;
+    const totalCount = ROZETLER.length;
+    const rank = calcRank(level);
+
+    [
+        { circle:"lvl-circle", name:"lvl-name-text", xp:"lvl-xp-text", bar:"lvl-bar-fill", rc:"lvl-rozet-count", rank:"lvl-rank-text" },
+        { circle:"lvl-circle-menu", name:"lvl-name-text-menu", xp:"lvl-xp-text-menu", bar:"lvl-bar-fill-menu", rc:"lvl-rozet-count-menu", rank:"lvl-rank-text-menu" }
+    ].forEach(ids => {
+        const c = document.getElementById(ids.circle); if (c) c.textContent = level;
+        const n = document.getElementById(ids.name); if (n) n.textContent = "Seviye " + level;
+        const x = document.getElementById(ids.xp); if (x) x.textContent = currentXp + " / " + neededXp + " XP";
+        const b = document.getElementById(ids.bar); if (b) b.style.width = pct + "%";
+        const r = document.getElementById(ids.rc); if (r) r.textContent = unlockedCount + "/" + totalCount + " 🏆";
+        const rk = document.getElementById(ids.rank); if (rk) rk.textContent = rank.icon + " " + rank.name;
+    });
+
+    const ru = document.getElementById("rozet-unlocked-count"); if (ru) ru.textContent = unlockedCount;
+    const rt = document.getElementById("rozet-total-count"); if (rt) rt.textContent = totalCount;
+    const rl = document.getElementById("rozet-lvl-text"); if (rl) rl.textContent = level;
+
+    updateDiffLocks(level);
+}
+
+/* Belirli bir zorluğun açık olup olmadığını döner.
+   ÖZEL KURAL: "Kolay" (id 1) artık seviyeye değil, en az 1 kez Isınma
+   yapılmış olmasına bağlı — Isınma tamamlanınca Kolay otomatik açılır. */
+function v4rinthZorlukAcikMi(d, lvl) {
+    const dNum = parseInt(d, 10);
+    if (ALWAYS_OPEN_DIFFS.includes(dNum)) return true;
+    if (progress.unlockedDiffs && progress.unlockedDiffs[dNum]) return true;
+    const need = DIFF_UNLOCK_LEVEL[d] || 1;
+    return lvl >= need;
+}
+
+function updateDiffLocks(level) {
+    const lvl = level !== undefined ? level : calcLevel(progress.totalXp).level;
+    let lockedCount = 0;
+    let nextNeed = null;
+    let yeniAcildi = false;
+    Object.keys(DIFF_UNLOCK_LEVEL).forEach(d => {
+        const dNum = parseInt(d, 10);
+        const btn = document.getElementById("dp-" + d);
+        if (!btn) return;
+        if (ALWAYS_OPEN_DIFFS.includes(dNum)) {
+            btn.style.display = "flex";
+            btn.classList.remove("locked");
+            return;
+        }
+        const locked = !v4rinthZorlukAcikMi(dNum, lvl);
+        if (locked) {
+            lockedCount++;
+            const need = DIFF_UNLOCK_LEVEL[d];
+            if (nextNeed === null || need < nextNeed) nextNeed = need;
+            btn.style.display = "none";
+        } else {
+            // Bir kez açılan zorluk kalıcı olarak "açık" diye işaretlenir
+            // (sonradan eşik yükseltilse bile bir daha kilitlenmesin).
+            if (!progress.unlockedDiffs) progress.unlockedDiffs = {};
+            if (!progress.unlockedDiffs[dNum]) {
+                progress.unlockedDiffs[dNum] = true;
+                yeniAcildi = true;
+            }
+            btn.style.display = "flex";
+        }
+        btn.classList.toggle("locked", locked);
+    });
+    if (yeniAcildi) saveProgress();
+    const info = document.getElementById("locked-info");
+    if (info) {
+        if (lockedCount > 0) {
+            info.style.display = "block";
+            let msg = "🔒 <strong>" + lockedCount + "</strong> zorluk henüz kilitli.";
+            if (nextNeed !== null) msg += " Bir sonraki mod Seviye " + nextNeed + "'de açılır.";
+            info.innerHTML = msg;
+        } else {
+            info.style.display = "none";
+        }
+    }
+}
+
+function renderRozetGrid() {
+    const grid = document.getElementById("rozet-grid");
+    if (!grid) return;
+    grid.innerHTML = ROZETLER.map(r => {
+        const unlocked = progress.unlockedBadges.includes(r.id);
+        return `<div class="rozet-card${unlocked ? " unlocked" : ""}">
+            <div class="rz-icon">${r.icon}</div>
+            <div class="rz-title">${r.title}</div>
+            <div class="rz-desc">${r.desc}</div>
+        </div>`;
+    }).join("");
+}
+/* ════════════════ /SEVİYE & ROZET SİSTEMİ ════════════════ */
+
+
+function txtAdaylariUret(mp3Adi) {
+    const uzantisiz = mp3Adi.replace(/\.mp3$/i, "");
+    const adaylar = [];
+    if (/^metin/i.test(uzantisiz)) adaylar.push(uzantisiz.replace(/^metin/i, "ses") + ".txt");
+    adaylar.push(uzantisiz + ".txt");
+    return adaylar;
+}
+
+function sesMetniniOku(mp3Adi, index) {
+    if (typeof V4rinthSesMetinleri === "undefined") {
+        console.warn("[MrVarinth] sesMetinleri.js yüklenemedi.");
+    } else if (Array.isArray(V4rinthSesMetinleri)) {
+        const v = V4rinthSesMetinleri[index];
+        if (v && String(v).trim()) return Promise.resolve(String(v));
+    } else {
+        const hedefAd = (mp3Adi || "").trim().toLowerCase();
+        for (const k in V4rinthSesMetinleri) {
+            if (String(k).trim().toLowerCase() === hedefAd) {
+                const v = V4rinthSesMetinleri[k];
+                if (v && String(v).trim()) return Promise.resolve(String(v));
+            }
+        }
+    }
+    const adaylar = txtAdaylariUret(mp3Adi);
+    function dene(i) {
+        if (i >= adaylar.length) return Promise.resolve("");
+        return fetch(sesMetinleriKlasoru + "/" + adaylar[i])
+            .then(r => { if (!r.ok) throw 0; return r.text(); })
+            .catch(() => dene(i + 1));
+    }
+    return dene(0);
+}
+
+function sesliMetinYukle() {
+    selectedAudioIndex = Math.floor(Math.random() * mp3Dosyalari.length);
+    const mp3Yolu = sesMetinleriKlasoru + "/" + mp3Dosyalari[selectedAudioIndex];
+    const audio = document.getElementById("dictation-audio");
+    const srcEl = document.getElementById("dictation-src");
+    srcEl.src = mp3Yolu;
+    audio.load();
+    audio.playbackRate = audioSpeed;
+    audioTimerReady = false;
+    audioDuration = 0;
+
+    audio.onloadedmetadata = function() {
+        const adjusted = Math.ceil(audio.duration / audioSpeed) + 30;
+        audioDuration = adjusted;
+        audioTimerReady = true;
+        if (isAudioMode && !gameStarted && !gameFinished) {
+            time = audioDuration;
+            document.getElementById("timer").textContent = time;
+        }
+    };
+    audio.onerror = function() {
+        audioDuration = selectedMinutes * 60;
+        audioTimerReady = true;
+        if (isAudioMode && !gameStarted && !gameFinished) {
+            time = audioDuration;
+            document.getElementById("timer").textContent = time;
+        }
+    };
+
+    audioTranscriptReady = false;
+    audioTranscriptText = "";
+    sesMetniniOku(mp3Dosyalari[selectedAudioIndex], selectedAudioIndex).then(t => {
+        audioTranscriptText = (t || "").trim();
+        audioTranscriptReady = !!audioTranscriptText;
+    });
+}
+
+function onSpeedSlider(val) {
+    audioSpeed = parseFloat(val);
+    const rounded = audioSpeed.toFixed(2);
+    document.getElementById("speed-val").textContent = rounded + "x";
+    audioEl.playbackRate = audioSpeed;
+    updateSliderFill(audioSpeed);
+    if (audioEl.duration && !isNaN(audioEl.duration)) {
+        const adjusted = Math.ceil(audioEl.duration / audioSpeed) + 30;
+        audioDuration = adjusted;
+        if (!gameStarted) {
+            time = adjusted;
+            document.getElementById("timer").textContent = time;
+        }
+    }
+}
+
+function updateSliderFill(val) {
+    const slider = document.getElementById("speed-slider");
+    const min = parseFloat(slider.min), max = parseFloat(slider.max);
+    const pct = ((val - min) / (max - min)) * 100;
+    slider.style.background = `linear-gradient(to right, var(--audio) 0%, var(--audio) ${pct}%, var(--border-strong) ${pct}%)`;
+}
+
+let currentTheme = "dark";
+function toggleTheme() {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    document.body.classList.toggle("theme-light", currentTheme === "light");
+    document.getElementById("theme-toggle").textContent = currentTheme === "light" ? "🌙" : "☀";
+}
+
+/* ── Panel fonksiyonları ── */
+function openPanel() { document.getElementById("right-panel").classList.add("open"); }
+function closePanel() { document.getElementById("right-panel").classList.remove("open"); }
+function toggleTimePanel() {
+    const tp = document.getElementById("time-panel");
+    tp.style.display = tp.style.display === "block" ? "none" : "block";
+}
+
+/* ── Yönetici Paneli (sadece kurucu — şifre korumalı) ──
+   Şifre doğrulama mantığı V4rinth paragraf metinleri/seviyeYonetimi.js
+   içinde tutulur; burada sadece arayüz (aç/kapat, giriş) yönetilir. */
+function toggleYoneticiPanel() {
+    const p = document.getElementById("yonetici-panel");
+    if (!p) return;
+    const acikMi = p.style.display === "block";
+    p.style.display = acikMi ? "none" : "block";
+    if (!acikMi) {
+        const input = document.getElementById("yonetici-sifre-input");
+        if (input) { input.value = ""; input.focus(); }
+    }
+}
+
+async function yoneticiGirisYap() {
+    const input = document.getElementById("yonetici-sifre-input");
+    const hataEl = document.getElementById("yonetici-login-hata");
+    if (typeof v4rinthSifreDogrula !== "function") {
+        alert("seviyeYonetimi.js yüklenemedi. 'V4rinth paragraf metinleri' klasörünün yolunu kontrol et.");
+        return;
+    }
+    const dogruMu = await v4rinthSifreDogrula(input.value);
+    if (!dogruMu) {
+        hataEl.style.display = "block";
+        input.value = "";
+        input.focus();
+        return;
+    }
+    hataEl.style.display = "none";
+    document.getElementById("yonetici-login").style.display = "none";
+    document.getElementById("yonetici-actions").style.display = "block";
+}
+
+function switchTab(tab) {
+    document.getElementById("tab-ileri").classList.toggle("active-tab", tab === "ileri");
+    document.getElementById("tab-rozet").classList.toggle("active-tab", tab === "rozet");
+    document.getElementById("pane-ileri").classList.toggle("active", tab === "ileri");
+    document.getElementById("pane-rozet").classList.toggle("active", tab === "rozet");
+    if (tab === "rozet") renderRozetGrid();
+    openPanel();
+}
+
+function saveTime() {
+    let val = Math.min(Math.max(parseInt(document.getElementById("time-input").value) || 1, 1), 60);
+    selectedMinutes = val;
+    time = val * 60;
+    document.getElementById("menu-time").textContent = val;
+    document.getElementById("panel-time-display").textContent = val + " dk";
+    document.getElementById("time-input-panel").value = val;
+    document.getElementById("time-panel").style.display = "none";
+}
+function saveTimePanel() {
+    let val = Math.min(Math.max(parseInt(document.getElementById("time-input-panel").value) || 1, 1), 60);
+    selectedMinutes = val;
+    time = val * 60;
+    document.getElementById("menu-time").textContent = val;
+    document.getElementById("panel-time-display").textContent = val + " dk";
+    document.getElementById("time-input").value = val;
+}
+
+const diffLabels = { 0:"🔥 Isınma", 1:"🟢 Kolay", 2:"🟡 Orta", 3:"🟠 Zor", 4:"🔴 Ultra Zor", 5:"🔊 Sesli Metin", 6:"🟣 Profesyonel", 11:"🔤 Harf Çalışmaları" };
+function selectDiffPanel(level, btn) {
+    const curLvl = calcLevel(progress.totalXp).level;
+    if (!v4rinthZorlukAcikMi(level, curLvl)) {
+        const needLvl = DIFF_UNLOCK_LEVEL[level] || 1;
+        showToast({ icon:"🔒", title:"Kilitli Mod", sub:"Bu modu açmak için Seviye " + needLvl + " gerekli" });
+        return;
+    }
+    difficulty = level;
+    document.querySelectorAll(".diff-item").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("menu-difficulty-val").textContent = diffLabels[level] || "?";
+    closePanel();
+}
+/* eski setDifficulty alias */
+function setDifficulty(level, btn) { selectDiffPanel(level, btn); }
+
+let difficulty = 11;
+let selectedMinutes = 1;
+let time = 60;
+let initialTime = 60;
+let timerInterval;
+let gameStarted = false;
+let gameFinished = false;
+let isWarmup = false;
+let isAudioMode = false;
+let isLetterMode = false;
+let gameStartTimestamp = 0;
+let letterMeta = [];
+let ctrlDown = false;
+let audioPlaying = false;
+let audioPending = false;
+let pendingPlayTimer = null;
+let ctrlLocked = false;
+const CTRL_HINT_DEFAULT = '<kbd>Ctrl</kbd> → Aç / Kapat';
+
+let paragraphQueue = [];
+let currentParaIdx = 0;
+let completedParas = [];
+let allTargetWords = [];
+let allTypedWords = [];
+let totalCorrectChars = 0;
+
+const textDiv = document.getElementById("text");
+const inputEl = document.getElementById("input");
+const audioEl = document.getElementById("dictation-audio");
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Control" && isAudioMode && !gameFinished && !e.repeat) {
+        if (ctrlLocked) return;
+        const countdownBox = document.getElementById("audio-countdown");
+        if (audioPlaying) {
+            audioEl.pause();
+            audioPlaying = false;
+        } else if (audioPending) {
+            clearInterval(pendingPlayTimer);
+            pendingPlayTimer = null;
+            audioPending = false;
+            countdownBox.classList.remove("active");
+            countdownBox.style.display = "none";
+            countdownBox.innerHTML = "";
+        } else {
+            audioPending = true;
+            let kalan = 6;
+            countdownBox.style.display = "flex";
+            countdownBox.classList.add("active");
+            countdownBox.innerHTML = "⏳ " + kalan + "sn";
+            pendingPlayTimer = setInterval(() => {
+                kalan--;
+                if (kalan <= 0) {
+                    clearInterval(pendingPlayTimer);
+                    pendingPlayTimer = null;
+                    audioPending = false;
+                    audioEl.play().catch(() => {});
+                    audioPlaying = true;
+                    countdownBox.classList.remove("active");
+                    countdownBox.style.display = "none";
+                    countdownBox.innerHTML = "";
+                } else {
+                    countdownBox.innerHTML = "⏳ " + kalan + "sn";
+                }
+            }, 1000);
+        }
+    }
+});
+
+function toggleSpeedPanel() {
+    document.getElementById("audio-speed-wrap").classList.toggle("show");
+}
+
+function toggleLock() {
+    ctrlLocked = !ctrlLocked;
+    const btn = document.getElementById("lock-btn");
+    const hint = document.getElementById("ctrl-hint");
+    if (ctrlLocked) {
+        hint.innerHTML = "🔒 CTRL Kilitli";
+        btn.textContent = "🔒 CTRL";
+        btn.classList.add("locked");
+    } else {
+        hint.innerHTML = CTRL_HINT_DEFAULT;
+        btn.textContent = "🔓 CTRL";
+        btn.classList.remove("locked");
+    }
+}
+
+/* ══════════════ HARF ÇALIŞMALARI (F Klavye standart öğretim sırası) ══════════════
+   Standart MEB F klavye müfredatındaki sıra izlenir: önce temel sıra (U İ E A K M L Y),
+   sonra T ve Ü, sonra üst/alt sıra harfleri, sonra kalan harfler, son olarak kelime ve
+   büyük harf (Shift) çalışması. Her satır motor tarafından otomatik olarak 3 kez yazdırılır.
+
+   NOT: Bu içerik artık "V4rinth paragraf metinleri/harfMetinleri.js" dosyasından
+   (V4rinthHarfMetinleri, seviyeli/numaralı yapı) okunuyor. Aşağıdaki LETTER_GROUPS
+   dizisi sadece o dosya yüklenemezse devreye giren YEDEK (fallback) içeriktir. */
+const LETTER_GROUPS = [
+    { title:"Temel Sıra — Sol El (U İ E A)", lines:[
+        "uuu iii eee aaa",
+        "ui ui ie ie ea ea ae ae",
+        "aue aue eau eau uea uea",
+        "aei aei uei uei aeu aeu",
+        "iaeu iaeu ueia ueia aeiu aeiu"
+    ]},
+    { title:"Temel Sıra — Sağ El (K M L Y)", lines:[
+        "kkk mmm lll yyy",
+        "km km ml ml ly ly yk yk",
+        "kly kly ylk ylk mky mky",
+        "klm klm lmy lmy ymk ymk",
+        "kmly kmly ylmk ylmk"
+    ]},
+    { title:"Temel Sıra — Karışık (UİEA + KMLY)", lines:[
+        "kau kau mei mei ley ley",
+        "ekam ekam ulay ulay imel imel",
+        "kale kale mali mali yele yele",
+        "elma elma kamu kamu lale lale",
+        "amel amel kale kale yumak yumak"
+    ]},
+    { title:"T Harfi (Sağ İşaret Parmağı)", lines:[
+        "ttt ttt tat tat tet tet",
+        "tut tut tit tit tam tam",
+        "kat kat mat mat at at",
+        "tatlı tatlı tatlı atlat atlat",
+        "tam tam katlam katlam atalet atalet"
+    ]},
+    { title:"Ü Harfi (Sol İşaret Parmağı)", lines:[
+        "üüü üüü aüa aüa akü akü",
+        "ütü ütü kül kül tüt tüt",
+        "küme küme tüm tüm yükü yükü",
+        "ütülü ütülü külüm külüm tütün tütün",
+        "ükü ükü tüme tüme tüyü tüyü"
+    ]},
+    { title:"Üst Sıra Harfleri (O R N I)", lines:[
+        "ooo rrr nnn ııı",
+        "or or rn rn ni ni io io",
+        "orman orman karın karın yorum yorum",
+        "ornin ornin ronay ronay nario nario",
+        "norma norma rotin rotin ironi ironi"
+    ]},
+    { title:"Alt Sıra Harfleri (S D Z C)", lines:[
+        "sss ddd zzz ccc",
+        "sd sd dz dz zc zc cs cs",
+        "süzde süzde caydı caydı sezdim sezdim",
+        "destan destan cazır cazır sızdı sızdı",
+        "dizce dizce sazcı sazcı cüzdan cüzdan"
+    ]},
+    { title:"Kalan Harfler (B F G Ğ H J P Ş V)", lines:[
+        "bbb fff ggg ğğğ hhh",
+        "jjj ppp şşş vvv",
+        "bağış bağış fişek fişek vahşi vahşi",
+        "pergel pergel hijyen hijyen şahbaz şahbaz",
+        "değiş değiş bağla bağla göğüs göğüs"
+    ]},
+    { title:"Karışık Kelime Çalışması", lines:[
+        "kalem kalem defter defter sıra sıra",
+        "okul okul öğretmen öğretmen sınıf sınıf",
+        "klavye klavye yazılım yazılım program program",
+        "hızlı hızlı doğru doğru pratik pratik",
+        "başarı başarı azim azim sabır sabır"
+    ]},
+    { title:"Noktalama ve Büyük Harf (Shift)", lines:[
+        "Ali, Ayşe ve Can okula gitti.",
+        "Bugün hava çok güzel, değil mi?",
+        "Türkiye'nin başkenti Ankara'dır.",
+        "Klavye çalışması her gün tekrar ister!",
+        "Sabır, başarının en önemli anahtarıdır."
+    ]}
+];
+
+function buildLetterQueueSync() {
+    let q = [];
+    let meta = [];
+    /* Önce dışarıdan, seviyeli olarak gelen V4rinthHarfMetinleri kullanılır
+       (V4rinth paragraf metinleri/harfMetinleri.js). Bulunamazsa yukarıdaki
+       gömülü LETTER_GROUPS yedek olarak devreye girer. */
+    const disaridanGeldi = (typeof V4rinthHarfMetinleri !== "undefined" && V4rinthHarfMetinleri && Object.keys(V4rinthHarfMetinleri).length);
+    const kaynak = disaridanGeldi
+        ? V4rinthHarfMetinleri
+        : LETTER_GROUPS.reduce((acc, g, i) => { acc[i + 1] = g; return acc; }, {});
+    console.log(disaridanGeldi
+        ? "[MrVarinth] Harf çalışmaları DIŞARIDAN yüklendi: V4rinth paragraf metinleri/harfMetinleri.js (" + Object.keys(kaynak).length + " seviye)"
+        : "[MrVarinth] UYARI: harfMetinleri.js bulunamadı/yüklenemedi, gömülü YEDEK (LETTER_GROUPS) kullanılıyor.");
+
+    Object.keys(kaynak).map(Number).sort((a, b) => a - b).forEach(seviye => {
+        const g = kaynak[seviye];
+        g.lines.forEach(line => {
+            for (let r = 1; r <= 3; r++) {
+                q.push(line);
+                meta.push({ title: g.title, rep: r, seviye: seviye });
+            }
+        });
+    });
+    letterMeta = meta;
+    return q;
+}
+/* ════════════ /HARF ÇALIŞMALARI ════════════ */
+
+function buildParagraphQueueSync() {
+    if (difficulty === 11) {
+        return buildLetterQueueSync();
+    }
+    if (difficulty === 5) {
+        let q = [];
+        for (let i = 0; i < 20; i++) q.push("");
+        return q;
+    }
+    if (typeof V4rinthMetinler === "undefined") {
+        alert("Hata: metinler.js dosyası bulunamadı!");
+        return ["metinler.js dosyası yüklenemedi."];
+    }
+    const pool = V4rinthMetinler[difficulty] || [];
+    if (pool.length === 0) return ["Bu zorluk seviyesi için metin bulunamadı."];
+    let q = [];
+    for (let i = 0; i < 10; i++) q = q.concat([...pool].sort(() => Math.random() - 0.5));
+    return q;
+}
+
+function startGame() {
+    const curLvl = calcLevel(progress.totalXp).level;
+    if (!v4rinthZorlukAcikMi(difficulty, curLvl)) {
+        const needLvl = DIFF_UNLOCK_LEVEL[difficulty] || 1;
+        showToast({ icon:"🔒", title:"Kilitli Mod", sub:"Bu modu açmak için Seviye " + needLvl + " gerekli" });
+        // Açık olan en uygun moda düş: önce Isınma açıksa ona, değilse her zaman açık olan Harf Çalışmaları'na.
+        const fallback = v4rinthZorlukAcikMi(0, curLvl) ? 0 : 11;
+        difficulty = fallback;
+        document.querySelectorAll(".diff-item").forEach(b => b.classList.remove("active"));
+        const dpFallback = document.getElementById("dp-" + fallback);
+        if (dpFallback) dpFallback.classList.add("active");
+        document.getElementById("menu-difficulty-val").textContent = diffLabels[fallback];
+        return;
+    }
+    closePanel();
+    document.getElementById("time-panel").style.display = "none";
+    paragraphQueue = buildParagraphQueueSync();
+    currentParaIdx = 0;
+    completedParas = [];
+    allTargetWords = [];
+    allTypedWords = [];
+    totalCorrectChars = 0;
+
+    document.getElementById("main-menu").style.display = "none";
+    document.getElementById("game-content").style.display = "block";
+    document.getElementById("back-btn").style.display = "block";
+
+    isWarmup = false;
+    isAudioMode = false;
+    audioPlaying = false;
+    audioPending = false;
+    ctrlLocked = false;
+    if (pendingPlayTimer) { clearInterval(pendingPlayTimer); pendingPlayTimer = null; }
+
+    const dot = document.getElementById("header-dot");
+    dot.className = "logo-dot";
+    document.getElementById("warmup-badge").style.display = "none";
+    document.getElementById("audio-badge").style.display = "none";
+    document.getElementById("ctrl-hint").style.display = "none";
+    document.getElementById("ctrl-hint").innerHTML = CTRL_HINT_DEFAULT;
+    document.getElementById("audio-countdown").style.display = "none";
+    document.getElementById("audio-countdown").classList.remove("active");
+    document.getElementById("audio-countdown").innerHTML = "";
+    document.getElementById("audio-speed-wrap").className = "";
+    document.getElementById("speed-toggle-btn").style.display = "none";
+    const lockBtn = document.getElementById("lock-btn");
+    lockBtn.style.display = "none";
+    lockBtn.textContent = "🔓 CTRL";
+    lockBtn.classList.remove("locked");
+    document.getElementById("text-area-wrapper").className = "text-area-wrapper";
+    document.getElementById("input-wrapper").className = "input-wrapper";
+    document.getElementById("timer").className = "";
+    textDiv.style.display = "block";
+    document.getElementById("audio-placeholder").className = "";
+
+    const hintEl = document.getElementById("text-hint");
+    hintEl.className = "text-area-hint";
+    hintEl.textContent = "Paragrafı bitirince Enter'a bas";
+
+    if (difficulty === 0) {
+        isWarmup = true;
+        dot.classList.add("warmup-dot");
+        document.getElementById("warmup-badge").style.display = "flex";
+        document.getElementById("text-area-wrapper").classList.add("warmup-mode");
+        document.getElementById("input-wrapper").classList.add("warmup-focus");
+        document.getElementById("timer").classList.add("warmup-timer");
+        time = 30;
+    } else if (difficulty === 5) {
+        isAudioMode = true;
+        dot.classList.add("audio-dot");
+        document.getElementById("audio-badge").style.display = "flex";
+        document.getElementById("ctrl-hint").style.display = "flex";
+        document.getElementById("text-area-wrapper").classList.add("audio-mode");
+        document.getElementById("input-wrapper").classList.add("audio-focus");
+        document.getElementById("timer").classList.add("audio-timer");
+        textDiv.style.display = "none";
+        document.getElementById("audio-placeholder").className = "show";
+        hintEl.textContent = "Ctrl tuşuna bas → ses çalar";
+        hintEl.className = "text-area-hint audio-hint";
+        document.getElementById("speed-toggle-btn").style.display = "inline-block";
+        document.getElementById("audio-speed-wrap").className = "";
+        document.getElementById("lock-btn").style.display = "inline-block";
+        audioSpeed = 0.90;
+        document.getElementById("speed-slider").value = 0.90;
+        document.getElementById("speed-val").textContent = "0.90x";
+        updateSliderFill(0.90);
+        sesliMetinYukle();
+        audioEl.currentTime = 0;
+        audioEl.playbackRate = audioSpeed;
+        time = selectedMinutes * 60;
+    } else {
+        time = selectedMinutes * 60;
+    }
+
+    document.getElementById("timer").textContent = time;
+    document.getElementById("timer").classList.remove("urgent");
+
+    gameStarted = false;
+    gameFinished = false;
+    ctrlDown = false;
+    inputEl.value = "";
+    inputEl.disabled = false;
+    inputEl.focus();
+
+    if (!isAudioMode) render(true);
+}
+
+function restartGame() {
+    clearInterval(timerInterval);
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    audioPlaying = false;
+    if (pendingPlayTimer) { clearInterval(pendingPlayTimer); pendingPlayTimer = null; }
+    audioPending = false;
+    document.getElementById("ctrl-hint").classList.remove("active");
+    document.getElementById("audio-countdown").classList.remove("active");
+    document.getElementById("audio-countdown").style.display = "none";
+    startGame();
+}
+
+function startRealAfterWarmup() {
+    closeWarmupModal();
+    difficulty = 1;
+    document.getElementById("menu-difficulty-val").textContent = diffLabels[1];
+    document.querySelectorAll(".diff-item").forEach(b => b.classList.remove("active"));
+    const dp1 = document.getElementById("dp-1");
+    if (dp1) dp1.classList.add("active");
+    startGame();
+}
+function closeWarmupModal() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("warmup-modal").style.display = "none";
+}
+
+function getCurrentPara() { return paragraphQueue[currentParaIdx]; }
+
+function render(isNewPara) {
+    if (isAudioMode) return;
+    const typed = inputEl.value;
+    const currentText = getCurrentPara();
+    let html = "";
+    completedParas.forEach(cp => {
+        html += '<span class="para-block para-done">';
+        for (let i = 0; i < cp.text.length; i++) {
+            if (i < cp.typed.length) {
+                const ok = cp.typed[i] === cp.text[i];
+                if (ok) html += '<span class="correct">' + esc(cp.text[i]) + "</span>";
+                else if (cp.text[i] === " ") html += '<span class="wrong wrong-space"> </span>';
+                else html += '<span class="wrong">' + esc(cp.text[i]) + "</span>";
+            } else html += esc(cp.text[i]);
+        }
+        html += "</span>";
+    });
+    html += '<span class="para-block para-active">';
+    for (let i = 0; i < currentText.length; i++) {
+        if (i < typed.length) {
+            const ok = typed[i] === currentText[i];
+            if (ok) html += '<span class="correct">' + esc(currentText[i]) + "</span>";
+            else if (currentText[i] === " ") html += '<span class="wrong wrong-space"> </span>';
+            else html += '<span class="wrong">' + esc(currentText[i]) + "</span>";
+        } else if (i === typed.length) {
+            html += '<span id="cursor-pos" class="current-letter">' + esc(currentText[i]) + "</span>";
+        } else html += esc(currentText[i]);
+    }
+    html += "</span>";
+    const nextPara = paragraphQueue[currentParaIdx + 1];
+    if (nextPara) html += '<span class="para-next">Sonraki: ' + esc(nextPara.substring(0,80)) + "…</span>";
+    textDiv.innerHTML = html;
+    // İmleç (cursor-pos) her zaman görünür alanda tutulur; yeni paragrafta
+    // imleç zaten en üstte olduğu için scrollTop doğal olarak 0'a yakın
+    // olur — ayrıca özel bir "en üste zıplat" kuralına gerek yok.
+    const cur = document.getElementById("cursor-pos");
+    if (cur) textDiv.scrollTop = Math.max(0, cur.offsetTop - (parseFloat(getComputedStyle(textDiv).lineHeight)||36)*5);
+    else textDiv.scrollTop = 0;
+    updateReadyHint(typed.length >= currentText.length);
+}
+
+function updateReadyHint(isReady) {
+    const hint = document.getElementById("text-hint");
+    if (isAudioMode) return;
+    if (isWarmup) {
+        hint.textContent = isReady ? "✓ Hazır! Enter'a bas" : "🔥 Isınma — Rahat yaz, hata önemli değil";
+        hint.className = "text-area-hint warmup-hint" + (isReady ? " ready" : "");
+    } else {
+        hint.textContent = isReady ? "✓ Hazır! Enter'a bas" : "Paragrafı bitirince Enter'a bas";
+        hint.className = "text-area-hint" + (isReady ? " ready" : "");
+    }
+}
+
+function esc(ch) {
+    if (ch === "&") return "&amp;";
+    if (ch === "<") return "&lt;";
+    if (ch === ">") return "&gt;";
+    return ch;
+}
+
+function advanceParagraph() {
+    const currentText = getCurrentPara();
+    const typed = inputEl.value;
+    const typedWords = typed.split(/\s+/).filter(w => w);
+    const targetWords = currentText.split(/\s+/).filter(w => w).slice(0, typedWords.length);
+    allTargetWords.push(...targetWords);
+    allTypedWords.push(...typedWords);
+    let correct = 0;
+    for (let i = 0; i < typed.length; i++) {
+        if (i < currentText.length && typed[i] === currentText[i]) correct++;
+    }
+    totalCorrectChars += correct;
+    completedParas.push({ text: currentText, typed });
+    currentParaIdx++;
+    inputEl.value = "";
+    if (!isAudioMode) render(true);
+}
+
+inputEl.addEventListener("input", () => {
+    if (!gameStarted && !gameFinished) { gameStarted = true; startTimer(); }
+    if (!isAudioMode) render(false);
+});
+
+inputEl.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        if (isAudioMode) return;
+        e.preventDefault();
+        if (gameFinished) return;
+        if (inputEl.value.trim().length > 0) advanceParagraph();
+    }
+});
+
+function startTimer() {
+    if (isAudioMode && audioTimerReady && audioDuration > 0) {
+        time = audioDuration;
+        document.getElementById("timer").textContent = time;
+    }
+    initialTime = time;
+    timerInterval = setInterval(() => {
+        time--;
+        document.getElementById("timer").textContent = time;
+        if (!isWarmup && !isAudioMode && time <= 10) document.getElementById("timer").classList.add("urgent");
+        if (isAudioMode && time <= 10) document.getElementById("timer").classList.add("urgent");
+        if (time <= 0) { isWarmup ? finishWarmup() : finishGame(); }
+    }, 1000);
+}
+
+function finishWarmup() {
+    clearInterval(timerInterval);
+    gameFinished = true;
+    inputEl.disabled = true;
+    audioEl.pause();
+    applyTestResult({ diff:0, netScore:0, dpm:0, errors:0, isWarmupTest:true });
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("warmup-modal").style.display = "block";
+}
+
+function finishGame() {
+    clearInterval(timerInterval);
+    gameFinished = true;
+    inputEl.disabled = true;
+    audioEl.pause();
+    audioPlaying = false;
+    if (pendingPlayTimer) { clearInterval(pendingPlayTimer); pendingPlayTimer = null; }
+    audioPending = false;
+    document.getElementById("ctrl-hint").classList.remove("active");
+    document.getElementById("audio-countdown").classList.remove("active");
+    document.getElementById("audio-countdown").style.display = "none";
+
+    let tgt = [], typ = [], fullTargetText = "";
+
+    if (isAudioMode) {
+        fullTargetText = audioTranscriptText || "";
+        const fullTypedText = inputEl.value;
+        const typWordsAudio = fullTypedText.split(/\s+/).filter(w => w);
+        const tgtWordsAudio = fullTargetText.split(/\s+/).filter(w => w).slice(0, typWordsAudio.length);
+        tgt = tgtWordsAudio;
+        typ = typWordsAudio;
+        let correct = 0;
+        for (let i = 0; i < fullTypedText.length; i++) {
+            if (i < fullTargetText.length && fullTypedText[i] === fullTargetText[i]) correct++;
+        }
+        totalCorrectChars = correct;
+    } else {
+        const currentText = getCurrentPara();
+        const typed = inputEl.value;
+        const typedWordsNow = typed.split(/\s+/).filter(w => w);
+        const targetWordsNow = currentText.split(/\s+/).filter(w => w).slice(0, typedWordsNow.length);
+        allTargetWords.push(...targetWordsNow);
+        allTypedWords.push(...typedWordsNow);
+        let correct = 0;
+        for (let i = 0; i < typed.length; i++) {
+            if (i < currentText.length && typed[i] === currentText[i]) correct++;
+        }
+        totalCorrectChars += correct;
+        tgt = allTargetWords;
+        typ = allTypedWords;
+        fullTargetText = currentText;
+    }
+
+    let wrongWords = 0;
+    const wrongDetails = {};
+    for (let i = 0; i < tgt.length; i++) {
+        if (typ[i] !== tgt[i]) {
+            wrongWords++;
+            wrongDetails[i] = { expected: tgt[i] || "[Boş]", actual: typ[i] || "[Yazılmadı]" };
+        }
+    }
+    const netScore = Math.max(0, totalCorrectChars - wrongWords * 20);
+    const elapsedSeconds = Math.max(1, initialTime - Math.max(time, 0));
+    const minutes = elapsedSeconds / 60;
+    const dpm = minutes > 0 ? Math.round(netScore / minutes) : netScore;
+
+    applyTestResult({ diff:difficulty, netScore, dpm, errors:wrongWords, isWarmupTest:false });
+
+    document.getElementById("chars").textContent = totalCorrectChars;
+    document.getElementById("errors").textContent = wrongWords;
+    document.getElementById("net").textContent = netScore;
+    document.getElementById("dpm").textContent = dpm;
+    document.getElementById("modal-time-badge").textContent = isAudioMode
+        ? (Math.floor((audioDuration - 30) / 60) + "dk " + ((audioDuration - 30) % 60) + "s")
+        : (selectedMinutes + " dk");
+
+    const errClass = isAudioMode ? "error-item audio-err" : "error-item";
+    let errorHtml = wrongWords === 0
+        ? '<div class="success-msg">🎉 Harika! Hiç hata yapmadın!</div>'
+        : Object.entries(wrongDetails).map(([i,{expected,actual}]) =>
+            `<div class="${errClass}"><div class="error-lbl">Kelime ${parseInt(i)+1}</div><div><span class="error-lbl">Beklenen:</span> <span class="error-expected">${expected}</span></div><div><span class="error-lbl">Yazılan:</span> <span class="error-actual">${actual}</span></div></div>`
+          ).join("");
+    document.getElementById("error-list").innerHTML = errorHtml;
+
+    const transcriptBox = document.getElementById("audio-transcript-box");
+    if (isAudioMode) {
+        if (fullTargetText) {
+            const words = fullTargetText.split(/(\s+)/);
+            let wIdx = 0;
+            let transcriptHtml = '<span class="aud-title">📄 Okunan Metin</span>';
+            words.forEach(tok => {
+                if (/^\s+$/.test(tok)) { transcriptHtml += tok; return; }
+                if (!tok) return;
+                if (wIdx >= typ.length) {
+                    transcriptHtml += `<span class="aud-untouched">${esc(tok)}</span>`;
+                    wIdx++;
+                    return;
+                }
+                const cls = (typ[wIdx] === tok) ? "aud-correct" : "aud-wrong";
+                transcriptHtml += `<span class="${cls}">${esc(tok)}</span>`;
+                wIdx++;
+            });
+            transcriptBox.innerHTML = transcriptHtml;
+        } else {
+            transcriptBox.innerHTML = '<span class="aud-title">📄 Okunan Metin</span><span style="opacity:.6">Bu ses için metin bulunamadı (' + esc(mp3Dosyalari[selectedAudioIndex]) + ').</span>';
+        }
+        transcriptBox.classList.add("show");
+    } else {
+        transcriptBox.classList.remove("show");
+        transcriptBox.innerHTML = "";
+    }
+    document.getElementById("show-details-btn").style.display = "inline-block";
+    document.getElementById("hide-details-btn").style.display = "none";
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("result-modal").style.display = "block";
+}
+
+function showDetails() {
+    document.getElementById("show-details-btn").style.display = "none";
+    document.getElementById("hide-details-btn").style.display = "inline-block";
+    document.getElementById("modal-right").classList.add("show");
+    document.getElementById("result-modal").classList.add("expanded");
+}
+function hideDetails() {
+    document.getElementById("show-details-btn").style.display = "inline-block";
+    document.getElementById("hide-details-btn").style.display = "none";
+    document.getElementById("modal-right").classList.remove("show");
+    document.getElementById("result-modal").classList.remove("expanded");
+}
+function closeResult() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("result-modal").style.display = "none";
+    hideDetails();
+    backToMenu();
+}
+function backToMenu() {
+    clearInterval(timerInterval);
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    audioPlaying = false;
+    document.getElementById("audio-speed-wrap").className = "";
+    document.getElementById("game-content").style.display = "none";
+    document.getElementById("back-btn").style.display = "none";
+    document.getElementById("main-menu").style.display = "block";
+}
+function toggleAi() { document.getElementById("ai-sidebar").classList.toggle("open"); }
+
+const aiKB = [
+    {k:["selam","merhaba","hey"],r:"Selam! 👋 Hız, doğruluk, parmak pozisyonu ya da pratik rutini hakkında soru sorabilirsin."},
+    {k:["hız","hizli","yavaş","artır"],r:"⚡ Hızlanmanın sırrı: Gözlerini metinden ayırma ve günlük en az 15 dakika düzenli pratik yap. Önce doğruluk, hız ondan sonra gelir."},
+    {k:["bakmadan","taktik","ezber"],r:"🎯 F ve J tuşlarındaki çıkıntıları başlangıç noktası olarak kullan, elini her zaman o pozisyona geri getir."},
+    {k:["hata","yanlış","doğruluk"],r:"❌ Hataların çoğu acele etmekten kaynaklanır. Yavaş ama hatasız yazmak uzun vadede daha hızlı sonuç verir."},
+    {k:["parmak","pozisyon","ergonomi"],r:"✋ Sol: U İ E A — Sağ: K M L Y. Başparmaklar boşluk çubuğunda. Bileklerini düz tut."},
+    {k:["ısınma","isinma","warmup"],r:"🔥 Isınma modunda (Zorluk 0) 30 saniye kolay metinle yazarsın. Sonra gerçek teste geçebilirsin."},
+    {k:["sesli","metin","ctrl","audio"],r:"🔊 Sesli Metin modunda Ctrl tuşuna bas → ses çalar/durur. Hız slider ile 0.5x–1.5x arası ayarlayabilirsin!"},
+    {k:["motivasyon","sıkıldım","zor"],r:"💪 Gelişim doğrusal değildir. Küçük hedefler koy ve ilerlemeni zamanla karşılaştır."},
+    {k:["pratik","rutin","kaç dakika"],r:"📅 Günde 15-20 dakikalık düzenli pratik, haftada bir uzun seanstan çok daha etkilidir."},
+    {k:["net puan","puan","skor"],r:"🎯 Net puan = doğru karakter − (yanlış kelime × 20). Doğruluk çok önemli!"},
+    {k:["teşekkür","sagol","eyvallah"],r:"Rica ederim! ⌨️"},
+    {k:["nasıl","yardım"],r:"🛠️ Menüden süre ve zorluk seç, BAŞLA ya bas. Yazmaya başladığında süre başlar. Enter ile sonraki paragrafa geçilir."}
+];
+function getAiReply(text) {
+    const lower = text.toLocaleLowerCase("tr");
+    for (const e of aiKB) { if (e.k.some(k => lower.includes(k))) return e.r; }
+    return "Bunu henüz tam bilemedim 🤔 ama hız, doğruluk, parmak pozisyonu veya Ctrl sesi hakkında soru sorabilirsin!";
+}
+function sendAiMessage() {
+    const inp = document.getElementById("ai-input");
+    const text = inp.value.trim();
+    if (!text) return;
+    addMsg(text,"user"); inp.value = "";
+    setTimeout(() => addMsg(getAiReply(text),"ai"), 400);
+}
+function sendSuggestion(text) { addMsg(text,"user"); setTimeout(() => addMsg(getAiReply(text),"ai"),350); }
+function addMsg(text,sender) {
+    const chat = document.getElementById("ai-chat");
+    const m = document.createElement("div");
+    m.className = "chat-msg chat-" + sender;
+    m.textContent = text;
+    chat.appendChild(m);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+updateSliderFill(0.90);
+
+/* ── Başlangıç durumu: sabit "Kolay" yerine, mevcut seviyeye göre AÇIK
+   olan zorlukların en sonuncusu (en yüksek unlockLevel'a sahip olanı)
+   otomatik seçilir. Böylece kullanıcı uygulamayı kapatıp geri açtığında
+   kaldığı/erişebildiği en üst zorlukla karşılaşır. */
+function v4rinthBaslangicZorluguSec() {
+    const curLvl = calcLevel(progress.totalXp).level;
+    // 1) Önce "gerçek" zorluklar arasında (AUTO_SELECT_EXCLUDE listesindekiler
+    //    hariç — örn. Isınma/Harf Çalışmaları) açık olan en yüksek seviyeliyi ara.
+    let secilecek = null;
+    DIFFICULTIES.forEach(d => {
+        if (AUTO_SELECT_EXCLUDE.includes(d.id)) return;
+        if (!v4rinthZorlukAcikMi(d.id, curLvl)) return;
+        if (secilecek === null || d.unlockLevel >= secilecek.unlockLevel) secilecek = d;
+    });
+    // 2) Hiçbir "gerçek" zorluk henüz açık değilse (örn. çok düşük level),
+    //    ÖZEL/giriş modları dahil TÜM açık olanlar arasından en yüksek
+    //    seviyeliyi seç — sabit "Kolay"a düşmek yerine gerçekten açık
+    //    olan (mesela Harf Çalışmaları) seçilmiş olur.
+    if (!secilecek) {
+        DIFFICULTIES.forEach(d => {
+            if (!v4rinthZorlukAcikMi(d.id, curLvl)) return;
+            if (secilecek === null || d.unlockLevel >= secilecek.unlockLevel) secilecek = d;
+        });
+    }
+    // 3) Buraya kadar hâlâ hiçbir şey bulunamadıysa (teorik olarak imkansıza
+    //    yakın) en düşük unlockLevel'a sahip olanı güvenli varsayılan yap.
+    if (!secilecek) {
+        secilecek = DIFFICULTIES.slice().sort((a,b) => a.unlockLevel - b.unlockLevel)[0];
+    }
+    const hedefId = secilecek.id;
+
+    difficulty = hedefId;
+    document.querySelectorAll(".diff-item").forEach(b => b.classList.remove("active"));
+    const dpHedef = document.getElementById("dp-" + hedefId);
+    if (dpHedef) dpHedef.classList.add("active");
+    document.getElementById("menu-difficulty-val").textContent = diffLabels[hedefId] || "?";
+}
+v4rinthRozetleriSenkronize();
+v4rinthBaslangicZorluguSec();
+updateLevelUI();
+</script>
+</body>
+</html>
